@@ -4,6 +4,7 @@ import Logo from "../components/Logo"
 import LOGO from '../../assets/logo.png';
 import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
 import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
+import { PrinterIcon, ChevronLeftIcon, FolderOpenIcon } from "@heroicons/react/24/solid";
 import { 
     TrashIcon,
     ArrowUpOnSquareIcon 
