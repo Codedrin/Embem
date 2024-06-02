@@ -66,9 +66,7 @@ const UploadFiles = () => {
 
         uploadAndAddToFirebase()
     }
-    const handleBackBtn = () => {
-        navigate("/");
-    };
+
     const handleChangeChosenFile = (e) => {
         let file = e.target.files[0]
 
@@ -76,7 +74,9 @@ const UploadFiles = () => {
 
         setSelectedFile(file)
     }
-
+    const handleBackBtn = () => {
+        navigate("/");
+    };
     return (
         <main className="w-[100vw] h-[100vh]">
                      <section className="bg-primary-500 h-[8%] flex items-center justify-center relative">
