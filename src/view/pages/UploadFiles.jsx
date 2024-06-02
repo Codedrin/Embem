@@ -1,7 +1,9 @@
 import Button from "../components/Button"
 import FileContainer from "../components/FileContainer"
 import Logo from "../components/Logo"
-
+import LOGO from '../../assets/logo.png';
+import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
+import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
 import { 
     TrashIcon,
     ArrowUpOnSquareIcon 
@@ -63,7 +65,9 @@ const UploadFiles = () => {
 
         uploadAndAddToFirebase()
     }
-
+    const handleBackBtn = () => {
+        navigate("/");
+    };
     const handleChangeChosenFile = (e) => {
         let file = e.target.files[0]
 
@@ -74,7 +78,13 @@ const UploadFiles = () => {
 
     return (
         <main className="w-[100vw] h-[100vh]">
-            <section className="h-[5%] bg-primary-500"></section>
+                     <section className="bg-primary-500 h-[8%] flex items-center justify-center relative">
+                <button className="absolute left-4 flex items-center p-4 gap-3" onClick={handleBackBtn}>
+                    <ChevronLeftIcon className="h-6 text-white" />
+                    <span><h1 className="font-bold text-white">Go back</h1></span>
+                </button>
+             
+            </section>
             <section className="h-[80%] flex items-center">
                 <div className="w-[100%] md:w-[50%] p-5 flex flex-col gap-4">
                     <h1 className="text-primary-500 font-bold">Upload your chosen file here</h1>
@@ -94,7 +104,16 @@ const UploadFiles = () => {
                     <img src={BG_PHOTO} alt="" />
                 </div>
             </section>
-            <section className="h-[15%] bg-primary-500"></section>
+            <section className="h-[12%] bg-primary-500  flex items-center justify-center">
+                <div className="mt-5">
+                    <p className="text-sm text-gray-300">Powered by</p>
+                    <ul className="flex gap-2">
+                        <li><img src={LOGO} className="h-10 grayscale" /></li>
+                        <li><img src={DROPBOX_LOGO} className="h-10 grayscale" /></li>
+                        <li><img src={FIREBASE_LOGO} className="h-10 grayscale" /></li>
+                    </ul>
+                </div>
+            </section>
         </main>
     )
 }
