@@ -12,16 +12,22 @@ import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
 import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
 
 const QRUpload = () => {
-    const navigate = useNavigate();
-    const [files, setFiles] = useState([]);
+
+    const navigate = useNavigate()
+    const [files, setFiles] = useState([])
 
     useEffect(() => {
         readFiles((snapshot) => {
-            const data = snapshot.val();
-            const filesInfo = data ? Object.values(data) : [];
-            setFiles(filesInfo);
-        });
-    }, []);
+            let data = snapshot.val()
+            let filesInfo = []
+
+            for(let key in data) {
+                filesInfo = [...filesInfo, data[key]]
+            }
+
+            setFiles(filesInfo)
+        })
+    }, [])
 
     const handleRemoveAll = async () => {
         try {
