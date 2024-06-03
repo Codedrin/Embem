@@ -1,43 +1,67 @@
-import { app, database } from "../config/firebase";
-import { ref, update, push, child, onValue, get, set } from "firebase/database";
+import { getApp } from "../config/firebase"
+import { getDatabase, ref, set, update, push, child, onValue, get } from "firebase/database"
 
-const REF = "files";
+const REF = "files"
 
-export const addFile = async (file) => {
-    try {
-        const { fileName, path, upload_date } = file;
+/**
+ * Adds a new file data
+ * to the Realtime-Database
+ * 
+ * TODO Test this first.
+ * 
+ * @param {*} file 
+ * @returns 
+ */
+export const addFile = (file) => {
+    const app = getApp()
+    const database = getDatabase(app)
 
-        const newFile = {
-            file_name: fileName,
-            file_path: path,
-            upload_date: upload_date
-        };
+    const { fileName, path, } = file
 
-        const newKey = push(child(ref(database), REF)).key;
-        const updates = {};
-        updates[`/${REF}/` + newKey] = newFile;
-
-        await update(ref(database), updates);
-        console.log("File added to Firebase");
-    } catch (error) {
-        console.error("Error adding file to Firebase:", error);
-        throw error;
+    const newFile = {
+        file_name: fileName,
+        file_path: path,
+        upload_date: new Date()
     }
-};
 
+    const newKey = push(child(ref(database), REF)).key
+
+    const updates = {}
+    updates[`/${REF}/` + newKey] = newFile
+    
+    return update(ref(database), updates)
+}
+
+/**
+ * Automatically updates
+ * the data based on the
+ * uploaded files.
+ * 
+ * TODO Test this first.
+ * 
+ * @returns 
+ */
 export const readFiles = (callback) => {
-    const filesRef = ref(database, `${REF}/`);
+    const app = getApp()
+    const database = getDatabase(app)
+    const filesRef = ref(database, `${REF}/`)
+
     return onValue(filesRef, (snapshot) => {
-        callback(snapshot);
-    });
-};
+        callback(snapshot)
+    })
+}
 
 export const readFilesOnce = (callback) => {
-    const filesRef = ref(database, `${REF}/`);
-    const dbRef = ref(database);
-    return get(child(dbRef, `${REF}/`)).then(callback);
-};
+    const app = getApp()
+    const database = getDatabase(app)
+    const filesRef = ref(database, `${REF}/`)
+
+    const dbRef = ref(getDatabase(app))
+    return get(child(dbRef, `${REF}/`)).then(callback)
+}
 
 export const deleteFiles = () => {
-    set(ref(database, `${REF}`), null);
-};
+    const app = getApp()
+    const database = getDatabase(app)
+    set(ref(database, `${REF}`), null)
+}

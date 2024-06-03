@@ -1,104 +1,102 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import { ArrowUpOnSquareIcon, ChevronLeftIcon } from '@heroicons/react/solid';
-import { getDatabase, ref, push, update, onValue } from 'firebase/database';
-import { app } from '../config/firebase';
-import BG_PHOTO from '../../assets/images/undraw-uploading.svg';
+import Button from "../components/Button"
+import FileContainer from "../components/FileContainer"
+import Logo from "../components/Logo"
+
+import { 
+    TrashIcon,
+    ArrowUpOnSquareIcon 
+} from "@heroicons/react/24/solid"
+
+import { uploadFile } from "../../controller/DropboxAPI"
+import { addFile, readFiles } from "../../controller/FirebaseAPI"
+import { toast } from "react-toastify"
+
+import { useState, useEffect } from "react"
+
+import BG_PHOTO from '../../assets/images/undraw-uploading.svg'
+
+import { UPLOAD_SUCCESS, UPLOAD_ERROR } from "../../utils/constants"
 
 const UploadFiles = () => {
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [files, setFiles] = useState([]);
+
+    const [files, setFiles] = useState([])
+    const [selectedFile, setSelectedFile] = useState(null)
 
     useEffect(() => {
-        const database = getDatabase(app);
-        const filesRef = ref(database, 'files/');
-        onValue(filesRef, (snapshot) => {
-            const data = snapshot.val();
-            const filesList = data ? Object.values(data) : [];
-            setFiles(filesList);
-        });
-    }, []);
+        readFiles((snapshot) => {
+            const data = snapshot.val()
+            let filesInfo = []
 
-    const handleFileUpload = async () => {
-        if (!selectedFile) return;
+            for(let key in data) {
+                filesInfo = [...filesInfo, data[key]]    
+            }
 
-        const database = getDatabase(app);
-        const newFileKey = push(ref(database, 'files')).key;
-        const updates = {};
-        updates[`/files/${newFileKey}`] = {
-            fileName: selectedFile.name,
-            path: newFileKey,
-            uploadDate: new Date().toISOString()
-        };
+            setFiles(filesInfo)
+        })
+    }, [])
 
-        try {
-            await update(ref(database), updates);
-            toast.success('File uploaded successfully!');
-        } catch (error) {
-            console.error(error);
-            toast.error('Something went wrong while uploading the file.');
+    const handleFileUpload = (e) => {
+        let file = selectedFile
+
+        const uploadAndAddToFirebase = async () => {
+            const ufRes = await uploadFile(file)
+            try{
+                if(ufRes.status != 200) {
+                    throw new Error(UPLOAD_ERROR)
+                }
+                const { data } = ufRes
+                const { name:fileName, path_display:path } = data
+    
+                let newFile = {
+                    fileName,
+                    path
+                }
+    
+                addFile(newFile)
+    
+                toast.success(UPLOAD_SUCCESS)
+            }catch(error) {
+                console.log(error)
+                toast.error(UPLOAD_ERROR)
+            }
         }
-    };
+
+        uploadAndAddToFirebase()
+    }
 
     const handleChangeChosenFile = (e) => {
-        const file = e.target.files[0];
-        if (file && (file.type === 'application/pdf' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
-            setSelectedFile(file);
-        } else {
-            toast.error('Only PDF and Word files are accepted.');
-        }
-    };
+        let file = e.target.files[0]
 
-    const handleBackBtn = () => {
-        navigate("/");
-    };
+        console.log(file)
+
+        setSelectedFile(file)
+    }
 
     return (
         <main className="w-[100vw] h-[100vh]">
-            <section className="bg-primary-500 h-[8%] flex items-center justify-center relative">
-                <button className="absolute left-4 flex items-center p-4 gap-3" onClick={handleBackBtn}>
-                    <ChevronLeftIcon className="h-6 text-white" />
-                    <span><h1 className="font-bold text-white">Go back</h1></span>
-                </button>
-            </section>
+            <section className="h-[5%] bg-primary-500"></section>
             <section className="h-[80%] flex items-center">
                 <div className="w-[100%] md:w-[50%] p-5 flex flex-col gap-4">
                     <h1 className="text-primary-500 font-bold">Upload your chosen file here</h1>
-                    <input
-                        type="file"
-                        className="block w-full text-sm text-primary-500
-                            file:mr-2 file:py-2 file:px-4
-                            file:rounded-full file:border-0
-                            file:text-sm file:font-semibold
-                            file:bg-primary-50 file:text-primary-700
-                            hover:file:bg-primary-100
-                            file:cursor-pointer"
-                        accept=".pdf,.docx"
-                        onChange={handleChangeChosenFile}
-                    />
-                    <button
+                    <input type="file" className="block w-full text-sm text-primary-500
+                        file:mr-2 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-primary-50 file:text-primary-700
+                        hover:file:bg-primary-100
+                        file:cursor-pointer" accept="application/pdf"
+                        onChange={handleChangeChosenFile} />
+                    <button 
                         className="w-fit bg-primary-50 py-2 px-4 rounded-full text-primary-700 font-bold text-sm hover:bg-primary-100 flex items-center gap-2"
-                        onClick={handleFileUpload}
-                    >
-                        Upload <span><ArrowUpOnSquareIcon className="h-4" /></span>
-                    </button>
+                        onClick={handleFileUpload}>Upload <span><ArrowUpOnSquareIcon className="h-4" /></span></button>
                 </div>
                 <div className="w-[50%] hidden md:block">
-                    <img src={BG_PHOTO} alt="Background" />
+                    <img src={BG_PHOTO} alt="" />
                 </div>
             </section>
-            <section className="h-[12%] bg-primary-500 flex items-center justify-center">
-                <div className="mt-5">
-                    <p className="text-sm text-gray-300">Powered by</p>
-                    <ul className="flex gap-2">
-                        <li><img src="LOGO" className="h-10 grayscale" alt="Logo" /></li>
-                        <li><img src="DROPBOX_LOGO" className="h-10 grayscale" alt="Dropbox Logo" /></li>
-                        <li><img src="FIREBASE_LOGO" className="h-10 grayscale" alt="Firebase Logo" /></li>
-                    </ul>
-                </div>
-            </section>
+            <section className="h-[15%] bg-primary-500"></section>
         </main>
-    );
-};
+    )
+}
 
-export default UploadFiles;
+export default UploadFiles
