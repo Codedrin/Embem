@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { ArrowUpOnSquareIcon, ChevronLeftIcon } from '@heroicons/react/solid';
+import { ArrowUpOnSquareIcon, ChevronLeftIcon } from '@heroicons/react/24/solid';
 import { getDatabase, ref, push, update, onValue } from 'firebase/database';
 import { getApp } from '../../config/firebase';
 import { useNavigate } from 'react-router-dom'; 
