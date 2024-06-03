@@ -42,15 +42,13 @@ export const addFile = (file) => {
  * @returns 
  */
 export const readFiles = (callback) => {
-    const app = getApp()
-    const database = getDatabase(app)
-    const filesRef = ref(database, `${REF}/`)
-
-    return onValue(filesRef, (snapshot) => {
-        callback(snapshot)
-    })
-}
-
+    const app = getApp();
+    const database = getDatabase(app);
+    const filesRef = ref(database, 'files/');
+    onValue(filesRef, (snapshot) => {
+        callback(snapshot);
+    });
+};
 export const readFilesOnce = (callback) => {
     const app = getApp()
     const database = getDatabase(app)
