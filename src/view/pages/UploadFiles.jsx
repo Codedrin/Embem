@@ -86,7 +86,7 @@ const UploadFiles = () => {
             <section className="bg-primary-500 h-[8%] flex items-center justify-center relative">
                 <button className="absolute left-4 flex items-center p-4 gap-3" onClick={handleBackBtn}>
                     <ChevronLeftIcon className="h-6 text-white" />
-                    <span><h1 className="font-bold text-white">Go back</h1></span>
+                    <span><h1 className="font-bold text-white"> back</h1></span>
                 </button>
             </section>
             <section className="h-[80%] flex items-center">
