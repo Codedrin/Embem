@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import QRCode from 'react-qr-code';
@@ -12,22 +12,16 @@ import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
 import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
 
 const QRUpload = () => {
-
-    const navigate = useNavigate()
-    const [files, setFiles] = useState([])
+    const navigate = useNavigate();
+    const [files, setFiles] = useState([]);
 
     useEffect(() => {
         readFiles((snapshot) => {
-            let data = snapshot.val()
-            let filesInfo = []
-
-            for(let key in data) {
-                filesInfo = [...filesInfo, data[key]]
-            }
-
-            setFiles(filesInfo)
-        })
-    }, [])
+            const data = snapshot.val();
+            const filesInfo = data ? Object.keys(data).map(key => ({ ...data[key], key })) : [];
+            setFiles(filesInfo);
+        });
+    }, []);
 
     const handleRemoveAll = async () => {
         try {
@@ -46,18 +40,16 @@ const QRUpload = () => {
         }
     };
 
-    const handleBackBtn = () => {
-        navigate('/');
-    };
-
-    const handleSettingsIcon = () => {
-        navigate('/admin-access');
+    const handleFileClick = (file) => {
+        if (file.fileName.endsWith('.pdf')) {
+            window.open(`https://your-storage-url/${file.fileName}`, '_blank');
+        }
     };
 
     return (
         <main className="w-[100vw] h-[100vh]">
             <section className="bg-primary-500 h-[8%] flex items-center justify-center relative">
-                <h1 className="text-white text-2xl font-bold cursor-pointer" onClick={handleBackBtn}>
+                <h1 className="text-white text-2xl font-bold cursor-pointer" onClick={() => navigate('/')}>
                     E M B E M
                 </h1>
             </section>
@@ -71,7 +63,7 @@ const QRUpload = () => {
                     </div>
                 </div>
                 <div className="w-[50%] p-5">
-                    <FileContainer files={files} />
+                    <FileContainer files={files} onFileClick={handleFileClick} />
                     <button
                         className="flex items-center px-4 py-2 rounded-full bg-danger-50 text-danger-700 hover:bg-danger-100 font-bold text-sm gap-2 m-2"
                         onClick={handleRemoveAll}

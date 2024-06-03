@@ -15,12 +15,12 @@ const UploadFiles = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const app = getApp(); 
+        const app = getApp();
         const database = getDatabase(app);
         const filesRef = ref(database, 'files/');
         onValue(filesRef, (snapshot) => {
             const data = snapshot.val();
-            const filesList = data ? Object.values(data) : [];
+            const filesList = data ? Object.keys(data).map(key => ({ ...data[key], key })) : [];
             setFiles(filesList);
         });
     }, []);
@@ -31,7 +31,7 @@ const UploadFiles = () => {
             return;
         }
 
-        const app = getApp(); 
+        const app = getApp();
         const database = getDatabase(app);
         const newFileKey = push(ref(database, 'files')).key;
         const updates = {};
