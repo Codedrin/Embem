@@ -1,4 +1,5 @@
 import { initializeApp } from "firebase/app";
+import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
     apiKey:            import.meta.env.VITE_FB_API_KEY,
@@ -11,4 +12,7 @@ const firebaseConfig = {
     measurementId:     import.meta.env.VITE_FB_MSRMNT_ID
 };
 
-export const getApp = () => initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+export { app, database };

@@ -1,7 +1,7 @@
+import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { uploadFile } from "../../controller/DropboxAPI";
 import { addFile, readFiles } from "../../controller/FirebaseAPI";
-import { toast } from "react-toastify";
-import { useState, useEffect } from "react";
 import { ArrowUpOnSquareIcon, ChevronLeftIcon } from "@heroicons/react/24/solid";
 import BG_PHOTO from '../../assets/images/undraw-uploading.svg';
 import { UPLOAD_SUCCESS, UPLOAD_ERROR } from "../../utils/constants";
@@ -26,37 +26,33 @@ const UploadFiles = () => {
         });
     }, []);
 
-    const handleFileUpload = (e) => {
+    const handleFileUpload = async () => {
         if (!selectedFile) {
             toast.error("No file selected");
             return;
         }
 
-        const uploadAndAddToFirebase = async () => {
-            try {
-                const ufRes = await uploadFile(selectedFile);
-                if (ufRes.status !== 200) {
-                    throw new Error('File upload failed');
-                }
-
-                const { data } = ufRes;
-                const { name: fileName, path_display: path } = data;
-
-                const newFile = {
-                    fileName,
-                    path,
-                    upload_date: new Date().toISOString()
-                };
-
-                await addFile(newFile);
-                toast.success(UPLOAD_SUCCESS);
-            } catch (error) {
-                console.error("Error uploading file:", error);
-                toast.error(UPLOAD_ERROR);
+        try {
+            const ufRes = await uploadFile(selectedFile);
+            if (ufRes.status !== 200) {
+                throw new Error('File upload failed');
             }
-        }
 
-        uploadAndAddToFirebase();
+            const { data } = ufRes;
+            const { name: fileName, path_display: path } = data;
+
+            const newFile = {
+                fileName,
+                path,
+                upload_date: new Date().toISOString()
+            };
+
+            await addFile(newFile);
+            toast.success(UPLOAD_SUCCESS);
+        } catch (error) {
+            console.error("Error uploading file:", error);
+            toast.error(UPLOAD_ERROR);
+        }
     }
 
     const handleChangeChosenFile = (e) => {
@@ -67,7 +63,12 @@ const UploadFiles = () => {
             return;
         }
 
-        const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'];
+        const allowedTypes = [
+            'application/pdf',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/msword'
+        ];
+
         if (!allowedTypes.includes(file.type)) {
             toast.error("Only PDF and Word files are accepted");
             setSelectedFile(null);
@@ -86,7 +87,7 @@ const UploadFiles = () => {
             <section className="bg-primary-500 h-[8%] flex items-center justify-center relative">
                 <button className="absolute left-4 flex items-center p-4 gap-3" onClick={handleBackBtn}>
                     <ChevronLeftIcon className="h-6 text-white" />
-                    <span><h1 className="font-bold text-white"> back</h1></span>
+                    <span><h1 className="font-bold text-white">Go back</h1></span>
                 </button>
             </section>
             <section className="h-[80%] flex items-center">
