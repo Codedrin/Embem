@@ -60,7 +60,7 @@ const QRUpload = () => {
     const handleBackBtn = (e) => {
         navigate("/")
     }
-    const localIP = "http://192.168.1.100:3000"; 
+
     const QR_VALUE = localIP + "/upload";
     return (
         <main className="w-[100vw] h-[100vh]">
