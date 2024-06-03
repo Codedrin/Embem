@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { ChevronLeftIcon, ArrowUpOnSquareIcon } from "@heroicons/react/24/solid";
@@ -11,6 +12,29 @@ import BG_PHOTO from '../../assets/images/undraw-uploading.svg';
 import { uploadFile } from "../../controller/DropboxAPI";
 import { addFile, readFiles } from "../../controller/FirebaseAPI";
 import { UPLOAD_SUCCESS, UPLOAD_ERROR } from "../../utils/constants";
+=======
+import Button from "../components/Button"
+import FileContainer from "../components/FileContainer"
+import Logo from "../components/Logo"
+import LOGO from '../../assets/logo.png';
+import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
+import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
+import { PrinterIcon, ChevronLeftIcon, FolderOpenIcon } from "@heroicons/react/24/solid";
+import { 
+    TrashIcon,
+    ArrowUpOnSquareIcon 
+} from "@heroicons/react/24/solid"
+
+import { uploadFile } from "../../controller/DropboxAPI"
+import { addFile, readFiles } from "../../controller/FirebaseAPI"
+import { toast } from "react-toastify"
+
+import { useState, useEffect } from "react"
+
+import BG_PHOTO from '../../assets/images/undraw-uploading.svg'
+
+import { UPLOAD_SUCCESS, UPLOAD_ERROR } from "../../utils/constants"
+>>>>>>> 2f2fdb61575cbeed54ac9226db4f74afb8af153b
 
 const UploadFiles = () => {
     const [files, setFiles] = useState([]);
@@ -72,6 +96,7 @@ const UploadFiles = () => {
             return;
         }
 
+<<<<<<< HEAD
         setSelectedFile(file);
     };
 
@@ -82,10 +107,24 @@ const UploadFiles = () => {
     return (
         <main className="w-[100vw] h-[100vh]">
             <section className="bg-primary-500 h-[8%] flex items-center justify-center relative">
+=======
+        setSelectedFile(file)
+    }
+    const handleBackBtn = () => {
+        navigate("/");
+    };
+    return (
+        <main className="w-[100vw] h-[100vh]">
+                     <section className="bg-primary-500 h-[8%] flex items-center justify-center relative">
+>>>>>>> 2f2fdb61575cbeed54ac9226db4f74afb8af153b
                 <button className="absolute left-4 flex items-center p-4 gap-3" onClick={handleBackBtn}>
                     <ChevronLeftIcon className="h-6 text-white" />
                     <span><h1 className="font-bold text-white">Go back</h1></span>
                 </button>
+<<<<<<< HEAD
+=======
+             
+>>>>>>> 2f2fdb61575cbeed54ac9226db4f74afb8af153b
             </section>
             <section className="h-[80%] flex items-center">
                 <div className="w-[100%] md:w-[50%] p-5 flex flex-col gap-4">
@@ -117,8 +156,25 @@ const UploadFiles = () => {
                     </ul>
                 </div>
             </section>
+<<<<<<< HEAD
+=======
+            <section className="h-[12%] bg-primary-500  flex items-center justify-center">
+                <div className="mt-5">
+                    <p className="text-sm text-gray-300">Powered by</p>
+                    <ul className="flex gap-2">
+                        <li><img src={LOGO} className="h-10 grayscale" /></li>
+                        <li><img src={DROPBOX_LOGO} className="h-10 grayscale" /></li>
+                        <li><img src={FIREBASE_LOGO} className="h-10 grayscale" /></li>
+                    </ul>
+                </div>
+            </section>
+>>>>>>> 2f2fdb61575cbeed54ac9226db4f74afb8af153b
         </main>
     );
 };
 
+<<<<<<< HEAD
 export default UploadFiles;
+=======
+export default UploadFiles
+>>>>>>> 2f2fdb61575cbeed54ac9226db4f74afb8af153b

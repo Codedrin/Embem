@@ -60,8 +60,13 @@ const QRUpload = () => {
     const handleBackBtn = (e) => {
         navigate("/")
     }
+<<<<<<< HEAD
 
     const QR_VALUE = localIP + "/upload";
+=======
+    
+ const QR_VALUE = window.location.origin + "/upload"
+>>>>>>> 2f2fdb61575cbeed54ac9226db4f74afb8af153b
     return (
         <main className="w-[100vw] h-[100vh]">
              <section className="bg-primary-500 h-[8%] flex items-center justify-center relative">
