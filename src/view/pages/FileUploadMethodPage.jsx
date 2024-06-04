@@ -23,7 +23,7 @@ const FileUploadMethodPage = () => {
     }
 
     const handleQrBtn = (e) => {
-        navigate("/upload");
+        navigate("/qr-upload");
     }
 
     const handleSettingsIcon = (e) => {
