@@ -6,10 +6,14 @@ import { useNavigate } from 'react-router-dom';
 const FileItem = ({ file }) => {
     const navigate = useNavigate();
 
-    const onClick = () => {
-        navigate(`window.origin/view/${file.fileName}`);
-    };
-
+ const onClick = () => {
+        navigate("/view", {
+            state: {
+                file_path: file.file_path,
+                file_name: file.file_name
+            }
+        })
+    }
     const getFileIcon = () => {
         if (file.fileName.endsWith('.pdf')) {
             return FI_PDF;
