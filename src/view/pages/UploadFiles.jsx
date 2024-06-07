@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { ArrowUpOnSquareIcon, ChevronLeftIcon } from '@heroicons/react/24/solid';
-import { getDatabase, ref, push, update, onValue } from 'firebase/database';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getDatabase, ref as databaseRef, push, update, onValue } from 'firebase/database';
 import { getApp } from '../../config/firebase';
 import { useNavigate } from 'react-router-dom'; 
 import BG_PHOTO from '../../assets/images/undraw-uploading.svg';
@@ -17,7 +18,7 @@ const UploadFiles = () => {
     useEffect(() => {
         const app = getApp();
         const database = getDatabase(app);
-        const filesRef = ref(database, 'files/');
+        const filesRef = databaseRef(database, 'files/');
         onValue(filesRef, (snapshot) => {
             const data = snapshot.val();
             const filesList = data ? Object.keys(data).map(key => ({ ...data[key], key })) : [];
@@ -32,17 +33,25 @@ const UploadFiles = () => {
         }
 
         const app = getApp();
+        const storage = getStorage(app);
         const database = getDatabase(app);
-        const newFileKey = push(ref(database, 'files')).key;
-        const updates = {};
-        updates[`/files/${newFileKey}`] = {
-            fileName: selectedFile.name,
-            path: newFileKey,
-            uploadDate: new Date().toISOString()
-        };
 
+        const storageReference = storageRef(storage, `files/${selectedFile.name}`);
         try {
-            await update(ref(database), updates);
+            // Upload the file to Firebase Storage
+            const snapshot = await uploadBytes(storageReference, selectedFile);
+            const downloadURL = await getDownloadURL(snapshot.ref);
+
+            // Save the file info to Firebase Realtime Database
+            const newFileKey = push(databaseRef(database, 'files')).key;
+            const updates = {};
+            updates[`/files/${newFileKey}`] = {
+                fileName: selectedFile.name,
+                url: downloadURL,
+                uploadDate: new Date().toISOString()
+            };
+
+            await update(databaseRef(database), updates);
             toast.success('File uploaded successfully!');
         } catch (error) {
             console.error(error);

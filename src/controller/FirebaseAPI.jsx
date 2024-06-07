@@ -1,24 +1,25 @@
-import { getApp } from "../config/firebase";
+import { getApp, storage } from "../config/firebase";
 import { getDatabase, ref, set, update, push, onValue, get, child } from "firebase/database";
+import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const REF = "files";
 
-/**
- * Adds a new file to the Realtime Database.
- * @param {Object} file - The file to be added.
- * @param {string} file.fileName - The name of the file.
- * @param {string} file.path - The path of the file.
- * @returns {Promise<void>}
- */
-export const addFile = (file) => {
+export const addFile = async (file) => {
     const app = getApp();
     const database = getDatabase(app);
 
-    const { fileName, path } = file;
+    const { fileName, fileContent } = file;
+    const storageReference = storageRef(storage, `files/${fileName}`);
+    
+    // Upload file to Firebase Storage
+    await uploadBytes(storageReference, fileContent);
+
+    // Get the download URL
+    const url = await getDownloadURL(storageReference);
 
     const newFile = {
-        fileName: fileName,
-        path: path,
+        fileName,
+        url,
         uploadDate: new Date().toISOString()
     };
 
@@ -30,10 +31,6 @@ export const addFile = (file) => {
     return update(ref(database), updates);
 };
 
-/**
- * Reads the files from the Realtime Database and calls the provided callback with the data.
- * @param {Function} callback - The callback function to be called with the data.
- */
 export const readFiles = (callback) => {
     const app = getApp();
     const database = getDatabase(app);
@@ -44,11 +41,6 @@ export const readFiles = (callback) => {
     });
 };
 
-/**
- * Reads the files from the Realtime Database once and calls the provided callback with the data.
- * @param {Function} callback - The callback function to be called with the data.
- * @returns {Promise<void>}
- */
 export const readFilesOnce = (callback) => {
     const app = getApp();
     const database = getDatabase(app);
@@ -57,12 +49,28 @@ export const readFilesOnce = (callback) => {
     return get(child(dbRef, `${REF}/`)).then(callback);
 };
 
-/**
- * Deletes all files from the Realtime Database.
- * @returns {Promise<void>}
- */
 export const deleteFiles = () => {
     const app = getApp();
     const database = getDatabase(app);
     return set(ref(database, `${REF}`), null);
+};
+
+export const readFileFromFirebase = async (filePath) => {
+    const app = getApp();
+    const database = getDatabase(app);
+    const fileRef = ref(database, `${REF}/${filePath}`);
+
+    try {
+        const snapshot = await get(fileRef);
+        if (snapshot.exists()) {
+            const fileData = snapshot.val();
+            console.log("File data received from Firebase:", fileData);
+            return fileData.url; // Return the file URL from Firebase Storage
+        } else {
+            throw new Error("File not found");
+        }
+    } catch (error) {
+        console.error("Error reading file from Firebase:", error);
+        throw error;
+    }
 };

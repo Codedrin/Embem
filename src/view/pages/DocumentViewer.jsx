@@ -1,11 +1,9 @@
-import { toast } from "react-toastify"
-import { downloadFile } from "../../controller/DropboxAPI"
-import DocumentView from "../components/DocumentView"
-import { useEffect, useState } from "react"
-import { useLocation } from "react-router-dom"
-import { PrinterIcon, ChevronLeftIcon } from "@heroicons/react/24/solid"
-import { useNavigate } from "react-router-dom"
-
+import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { PrinterIcon, ChevronLeftIcon } from "@heroicons/react/24/solid";
+import { useNavigate } from "react-router-dom";
+import DocumentView from "../components/DocumentView";
 import {
     ALL_PAGES,
     SPECIFIC_ONLY,
@@ -16,127 +14,96 @@ import {
     FILE_NOT_FOUND_ERROR_MESSAGE,
     PRINT_ERROR_SPECIFIC_PAGES,
     PRINT_ERROR_NUM_COPIES
-} from "../../utils/constants"
+} from "../../utils/constants";
 
 const DocumentViewer = () => {
+    const [printMethod, setPrintMethod] = useState(ALL_PAGES);
+    const [printStyle, setPrintStyle] = useState(COLORED);
+    const [file, setFile] = useState(null);
+    const [maxPages, setMaxPages] = useState(-1);
+    const [fromPages, setFromPages] = useState(1);
+    const [toPages, setToPages] = useState(1);
+    const [copies, setCopies] = useState(1);
+    const [name, setName] = useState('');
 
-    const [printMethod, setPrintMethod] = useState(ALL_PAGES)
-    const [printStyle, setPrintStyle] = useState(COLORED)
-    const [file, setFile] = useState(null)
-    const [maxPages, setMaxPages] = useState(-1)
-    const [fromPages, setFromPages] = useState(1)
-    const [toPages, setToPages] = useState(1)
-    const [copies, setCopies] = useState(1)
-    const [name, setName] = useState('')
-
-    const location = useLocation()
-    const navigate = useNavigate()
+    const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
-        try{
-            const { bt_file, file_name, file_path } = location.state
+        const { file_url, file_name } = location.state;
 
-            // Direct file from Bluetooth
-            if(bt_file) {
-                setFile(bt_file)
-                setName(file_name)
-            }else{
-                if(file_path == null) {
-                    throw new Error(FILE_NOT_FOUND_ERROR_MESSAGE)
-                }
-    
-                (async () => {
-                    try{
-                        const downloadedFile = await downloadFile(file_path)
-                        if(downloadedFile != null) {
-                            setFile(downloadedFile)
-                            setName(file_name)
-                            toast.success(FILE_RETRIEVE_SUCCESS_MESSAGE)
-                        }else{
-                            throw new Error(FILE_RETRIEVE_ERROR_MESSAGE)
-                        }
-                    }catch(error) {
-                        console.log(error)
-                        toast.error(error)
-                    }
-                })()
-            }
-
-        }catch(error){
-            console.error(error)
-            toast.error(error)
+        if (file_url) {
+            setFile(file_url);
+            setName(file_name);
+            toast.success(FILE_RETRIEVE_SUCCESS_MESSAGE);
+        } else {
+            toast.error(FILE_NOT_FOUND_ERROR_MESSAGE);
         }
-    }, [])
+    }, [location.state]);
 
     const handleOnLoadDocument = (doc) => {
-        const { numPages } = doc
+        const { numPages } = doc;
+        setFromPages(1);
+        setToPages(numPages);
+        setMaxPages(numPages);
+    };
 
-        console.log(doc)
+    const handleChangePrintMethod = (e) => {
+        setPrintMethod(e.target.value);
+    };
 
-        setFromPages(1)
-        setToPages(numPages)
-        setMaxPages(numPages)
-    }
+    const handleChangePrintStyle = (e) => {
+        setPrintStyle(e.target.value);
+    };
 
-    const handleChangePrintMethod = e => {
-        setPrintMethod(e.target.value)
-    }
+    const handleProceedButton = (e) => {
+        e.preventDefault();
 
-    const handleChangePrintStyle = e => {
-        setPrintStyle(e.target.value)
-    }
+        let modFromPages = -1;
+        let modToPages = -1;
 
-    const handleProceedButton = e => {
-        try{
-            e.preventDefault()
-
-            let modFromPages = -1
-            let modToPages = -1
-
-            if(printMethod == SPECIFIC_ONLY) {
-                if(fromPages > maxPages || toPages > maxPages) {
-                    throw new Error(PRINT_ERROR_SPECIFIC_PAGES)
-                }
-
-                modFromPages = fromPages
-                modToPages = toPages
-            }else{
-                modFromPages = 1
-                modToPages = maxPages
+        if (printMethod === SPECIFIC_ONLY) {
+            if (fromPages > maxPages || toPages > maxPages) {
+                toast.error(PRINT_ERROR_SPECIFIC_PAGES);
+                return;
             }
 
-            if(copies < 1 || copies > 100) {
-                throw new Error(PRINT_ERROR_NUM_COPIES)
-            }
-
-            navigate("/print", {
-                state:{
-                    file,
-                    name,
-                    numPages: maxPages,
-                    fromPages: modFromPages,
-                    toPages: modToPages,
-                    copies,
-                    printStyle,
-                    printMethod
-                }
-            })
-        }catch(error){
-            console.log(error)
-            toast.error(error)
+            modFromPages = fromPages;
+            modToPages = toPages;
+        } else {
+            modFromPages = 1;
+            modToPages = maxPages;
         }
-    }
 
-    const handleBackBtn = e => {
-        navigate(-1)
-    }
+        if (copies < 1 || copies > 100) {
+            toast.error(PRINT_ERROR_NUM_COPIES);
+            return;
+        }
+
+        navigate("/print", {
+            state: {
+                file,
+                name,
+                numPages: maxPages,
+                fromPages: modFromPages,
+                toPages: modToPages,
+                copies,
+                printStyle,
+                printMethod
+            }
+        });
+    };
+
+    const handleBackBtn = () => {
+        navigate(-1);
+    };
 
     return (
         <main className="w-[100%] h-[100vh]">
             <section className="h-[5%] bg-primary-500 flex items-center">
                 <button className="flex items-center p-4 gap-3" onClick={handleBackBtn}>
-                        <ChevronLeftIcon className="h-6 text-white" />
-                        <span><h1 className="font-bold text-white">Choose another file</h1></span>
+                    <ChevronLeftIcon className="h-6 text-white" />
+                    <span><h1 className="font-bold text-white">Choose another file</h1></span>
                 </button>
             </section>
             <section className="h-[90%] flex overflow-auto">
@@ -151,7 +118,7 @@ const DocumentViewer = () => {
                             <h5 className="font-bold text-sm mb-1 text-gray-900">File Name</h5>
                             <input
                                 className="border px-3 py-2 rounded-md text-sm" 
-                                type="text" disabled placeholder="test-file.pdf" value={name} />
+                                type="text" disabled placeholder={name} value={name} />
                         </div>
                         <div className="my-5">
                             <h5 className="font-bold text-sm mb-1 text-gray-900">Total Pages</h5>
@@ -165,11 +132,11 @@ const DocumentViewer = () => {
                         </div>
                         <div className="ml-5 flex flex-col gap-1 mt-2">
                             <div className="flex items-center gap-2">
-                                <input type="radio" name="pages-options" id="" checked={printMethod==ALL_PAGES} onChange={handleChangePrintMethod} value={ALL_PAGES} className="text-primary-500"/>
+                                <input type="radio" name="pages-options" checked={printMethod === ALL_PAGES} onChange={handleChangePrintMethod} value={ALL_PAGES} className="text-primary-500"/>
                                 <h5 className="text-sm font-semibold">All pages</h5>
                             </div>
                             <div className="flex items-center gap-2">
-                                <input type="radio" name="pages-options" id="" checked={printMethod==SPECIFIC_ONLY} onChange={handleChangePrintMethod} value={SPECIFIC_ONLY} className="text-primary-500"/>
+                                <input type="radio" name="pages-options" checked={printMethod === SPECIFIC_ONLY} onChange={handleChangePrintMethod} value={SPECIFIC_ONLY} className="text-primary-500"/>
                                 <h5 className="text-sm font-semibold">Specific pages only</h5>
                             </div>
                             <div className="flex flex-row gap-3 ml-6 mt-2">
@@ -177,14 +144,14 @@ const DocumentViewer = () => {
                                     <h5 className="font-bold text-sm mb-1 text-gray-900">From pages</h5>
                                     <input
                                         className="border px-3 py-2 rounded-md text-sm focus:outline-primary-500 w-24"  
-                                        type="number" disabled={printMethod != SPECIFIC_ONLY} value={fromPages}
+                                        type="number" disabled={printMethod !== SPECIFIC_ONLY} value={fromPages}
                                         max={maxPages} min={1} onChange={(e) => setFromPages(e.target.value)} />
                                 </div>
                                 <div className="">
                                     <h5 className="font-bold text-sm mb-1 text-gray-900">To page</h5>
                                     <input
                                         className="border px-3 py-2 rounded-md text-sm focus:outline-primary-500 w-24" 
-                                        type="number" disabled={printMethod != SPECIFIC_ONLY} value={toPages}
+                                        type="number" disabled={printMethod !== SPECIFIC_ONLY} value={toPages}
                                         max={maxPages} min={1} onChange={(e) => setToPages(e.target.value)} />
                                 </div>
                             </div>
@@ -195,14 +162,14 @@ const DocumentViewer = () => {
                         </div>
                         <div className="ml-5 flex flex-col gap-1 mt-2">
                             <div className="flex gap-2">
-                                <input type="radio" name="print-options" id="" checked={printStyle == COLORED} className="text-primary-500" onChange={handleChangePrintStyle} value={COLORED}/>
+                                <input type="radio" name="print-options" checked={printStyle === COLORED} className="text-primary-500" onChange={handleChangePrintStyle} value={COLORED}/>
                                 <div>
                                     <h5 className="text-sm font-semibold">Colored</h5>
                                     <p className="text-xs text-gray-400">Proceed with printing it with color.</p>
                                 </div>
                             </div>
                             <div className="flex gap-2">
-                                <input type="radio" name="print-options" id="" checked={printStyle == GRAYSCALE} className="text-primary-500" onChange={handleChangePrintStyle} value={GRAYSCALE}/>
+                                <input type="radio" name="print-options" checked={printStyle === GRAYSCALE} className="text-primary-500" onChange={handleChangePrintStyle} value={GRAYSCALE}/>
                                 <div>
                                     <h5 className="text-sm font-semibold">Grayscale</h5>
                                     <p className="text-xs text-gray-400">Proceed with printing in black and white.</p>
@@ -227,4 +194,4 @@ const DocumentViewer = () => {
     )
 }
 
-export default DocumentViewer
+export default DocumentViewer;

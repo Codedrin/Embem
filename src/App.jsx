@@ -8,7 +8,8 @@ import {
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-import WelcomePage from './view/pages/WelcomePage.jsx'
+  
+
 import FileUploadMethodPage from './view/pages/FileUploadMethodPage.jsx'
 import QRUpload from "./view/pages/QRUpload.jsx"
 import UploadFiles from "./view/pages/UploadFiles.jsx"

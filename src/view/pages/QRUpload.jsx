@@ -41,15 +41,14 @@ const QRUpload = () => {
     };
 
     const handleFileClick = (file) => {
-        const { fileName } = file;
-        if (fileName.endsWith('.pdf') || fileName.endsWith('.docx')) {
-            navigate(`/view/${fileName}`);
-        } else {
-            console.error('Unsupported file type');
-            toast.error('Unsupported file type');
-        }
+        navigate('/view', {
+            state: {
+                file_path: file.file_path,
+                file_name: file.file_name,
+            }
+        });
     };
-    
+
     return (
         <main className="w-[100vw] h-[100vh]">
             <section className="bg-primary-500 h-[8%] flex items-center justify-center relative">
