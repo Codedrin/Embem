@@ -25,9 +25,6 @@ const AdminAccess = () => {
         navigate("/");
     };
 
-
-
-
     const handleSubmitBtn = (e) => {
         e.preventDefault();
 
@@ -43,28 +40,27 @@ const AdminAccess = () => {
     };
 
     return (
-        <main className="h-[100vh] w-[100vw]">
-         <section className="bg-primary-500 h-[8%] flex items-center justify-center relative">
+        <main className="h-screen w-full flex flex-col">
+            <section className="bg-primary-500 h-16 flex items-center justify-center relative">
                 <button className="absolute left-4 flex items-center p-4 gap-3" onClick={handleBackBtn}>
                     <ChevronLeftIcon className="h-6 text-white" />
                     <span><h1 className="font-bold text-white">Back</h1></span>
                 </button>
-                
             </section>
-            <section className="h-[90%] flex">
-                <div className="w-[50%] h-full bg-primary-100 flex justify-center items-center">
-                    <div className="">
+            <section className="flex flex-grow flex-col md:flex-row">
+                <div className="w-full md:w-1/2 h-full bg-primary-100 flex justify-center items-center p-5">
+                    <div className="text-center md:text-left">
                         <h1 className="text-xl font-bold">Administrator Only</h1>
                         <p className="text-sm text-gray-500">This is an administrator only access.</p>
                     </div>
                 </div>
-                <div className="w-[50%] flex justify-center items-center">
-                    <form action="" className="flex flex-col gap-2">
+                <div className="w-full md:w-1/2 flex justify-center items-center p-5">
+                    <form action="" className="flex flex-col gap-2 w-full max-w-md">
                         <div className="my-2">
                             <h5 className="font-semibold text-sm mb-1 text-gray-900 flex items-center gap-2">Password</h5>
                             <p className="text-xs mb-2 text-gray-500">To commit changes in this system, <br/>you must enter the administrator password.</p>
                             <input 
-                                className="border px-3 py-2 rounded-md text-sm outline-primary-200" 
+                                className="border px-3 py-2 rounded-md text-sm outline-primary-200 w-full" 
                                 type="password" 
                                 placeholder=""
                                 value={password}
@@ -78,10 +74,10 @@ const AdminAccess = () => {
                     </form>
                 </div>
             </section>
-            <section className="h-[12%] bg-primary-500  flex items-center justify-center">
-                <div className="mt-5">
+            <section className="bg-primary-500 flex items-center justify-center py-4">
+                <div className="text-center">
                     <p className="text-sm text-gray-300">Powered by</p>
-                    <ul className="flex gap-2">
+                    <ul className="flex gap-2 justify-center mt-2">
                         <li><img src={LOGO} className="h-10 grayscale" /></li>
                         <li><img src={DROPBOX_LOGO} className="h-10 grayscale" /></li>
                         <li><img src={FIREBASE_LOGO} className="h-10 grayscale" /></li>

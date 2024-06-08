@@ -67,40 +67,38 @@ const SettingsPage = () => {
     }
 
     return (
-        <main className="h-[100vh] w-[100vw] flex-col">
-  <section className="bg-primary-500 h-[8%] flex items-center justify-center relative">
+        <main className="min-h-screen w-full flex flex-col">
+            <section className="bg-primary-500 h-16 flex items-center justify-center relative">
                 <button className="absolute left-4 flex items-center p-4 gap-3" onClick={handleBackBtn}>
                     <ChevronLeftIcon className="h-6 text-white" />
                     <span><h1 className="font-bold text-white">Back</h1></span>
                 </button>
-   
             </section>
-            
-            <section className="h-[90%] flex">
-                <div className="w-[50%] h-full bg-primary-50 flex flex-col justify-center items-center">
-                    <div className="">
+            <section className="flex flex-col md:flex-row flex-grow">
+                <div className="w-full md:w-1/2 h-full flex flex-col justify-center items-center p-5">
+                    <div className="text-center md:text-left">
                         <h1 className="text-xl font-bold">Settings</h1>
                         <p className="text-sm text-gray-500">Update the settings according to your preferences</p>
                     </div>
                 </div>
-                <div className="w-[50%] flex justify-center items-center">
-                    <form action="" className="flex flex-col gap-4">
+                <div className="w-full md:w-1/2 flex justify-center items-center p-5">
+                    <form action="" className="flex flex-col gap-4 w-full max-w-md">
                         <div className="flex flex-col gap-2">
                             <h1 className="text-lg font-bold text-primary-500">Bluetooth</h1>
                             <div className="my-2">
-                                <h5 className="font-semibold text-sm mb-1 text-gray-900 flex items-center gap-2">Bluetooth Name</h5>
-                                <p className="text-xs mb-2 text-gray-500">Changed the bluetooth name<br/> according to the device's blueooth.</p>
+                                <h5 className="font-semibold text-sm mb-1 text-gray-900">Bluetooth Name</h5>
+                                <p className="text-xs mb-2 text-gray-500">Changed the bluetooth name<br/> according to the device's bluetooth.</p>
                                 <input 
-                                    className="border px-3 py-2 rounded-md text-sm outline-primary-200" 
+                                    className="border px-3 py-2 rounded-md text-sm outline-primary-200 w-full" 
                                     placeholder="Ex. BT-140"
                                     value={iBTName}
                                     onChange={e => setIBTName(e.target.value)}/>
                             </div>
                             {/* <div className="my-2">
-                                <h5 className="font-semibold text-sm mb-1 text-gray-900 flex items-center gap-2">Bluetooth Folder</h5>
+                                <h5 className="font-semibold text-sm mb-1 text-gray-900">Bluetooth Folder</h5>
                                 <p className="text-xs mb-2 text-gray-500">Choose the path of where should the<br/> bluetooth files go</p>
                                 <input 
-                                    className="border px-3 py-2 rounded-md text-sm outline-primary-200" 
+                                    className="border px-3 py-2 rounded-md text-sm outline-primary-200 w-full" 
                                     type="url"
                                     placeholder="C:/"
                                     value={iBTFolder}
@@ -110,10 +108,10 @@ const SettingsPage = () => {
                         <div>
                             <h1 className="text-lg font-bold text-primary-500">Timeout</h1>
                             <div className="my-2">
-                                <h5 className="font-semibold text-sm mb-1 text-gray-900 flex items-center gap-2">Delete files after (minutes) of being idle</h5>
+                                <h5 className="font-semibold text-sm mb-1 text-gray-900">Delete files after (minutes) of being idle</h5>
                                 <p className="text-xs mb-2 text-gray-500">Files sent to the server<br/> will be deleted after the given time.</p>
                                 <input 
-                                    className="border px-3 py-2 rounded-md text-sm outline-primary-200" 
+                                    className="border px-3 py-2 rounded-md text-sm outline-primary-200 w-full" 
                                     placeholder="default 30 mins"
                                     type="number"
                                     value={iTimeout / 60 / 1000}
@@ -123,10 +121,10 @@ const SettingsPage = () => {
                         <div>
                             <h1 className="text-lg font-bold text-primary-500">Administrator</h1>
                             <div className="my-2">
-                                <h5 className="font-semibold text-sm mb-1 text-gray-900 flex items-center gap-2">Password</h5>
+                                <h5 className="font-semibold text-sm mb-1 text-gray-900">Password</h5>
                                 <p className="text-xs mb-2 text-gray-500">Change the password to enter this settings option.</p>
                                 <input 
-                                    className="border px-3 py-2 rounded-md text-sm outline-primary-200" 
+                                    className="border px-3 py-2 rounded-md text-sm outline-primary-200 w-full" 
                                     type="password" 
                                     placeholder=""
                                     value={iPassword}
@@ -141,10 +139,10 @@ const SettingsPage = () => {
                     </form>
                 </div>
             </section>
-            <section className="h-[12%] bg-primary-500  flex items-center justify-center">
-                <div className="mt-5">
+            <section className="bg-primary-500 flex items-center justify-center py-4">
+                <div className="text-center">
                     <p className="text-sm text-gray-300">Powered by</p>
-                    <ul className="flex gap-2">
+                    <ul className="flex gap-2 justify-center mt-2">
                         <li><img src={LOGO} className="h-10 grayscale" /></li>
                         <li><img src={DROPBOX_LOGO} className="h-10 grayscale" /></li>
                         <li><img src={FIREBASE_LOGO} className="h-10 grayscale" /></li>

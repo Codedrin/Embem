@@ -50,35 +50,35 @@ const QRUpload = () => {
     };
 
     return (
-        <main className="w-[100vw] h-[100vh]">
-            <section className="bg-primary-500 h-[8%] flex items-center justify-center relative">
-                <h1 className="text-white text-2xl font-bold cursor-pointer" onClick={() => navigate('/')}>
+        <main className="min-h-screen flex flex-col">
+            <section className="bg-primary-500 h-16 flex items-center justify-center relative">
+                <h1 className="text-white text-2xl font-bold cursor-pointer">
                     E M B E M
                 </h1>
             </section>
-            <section className="h-[80%] flex md:flex-row flex-col items-center justify-center p-5">
-                <div className="w-[50%] flex flex-col items-center">
-                    <div className="bg-primary-500 w-fit rounded-lg p-3">
+            <section className="flex flex-col md:flex-row items-center justify-center flex-grow p-5">
+                <div className="w-full md:w-1/2 flex flex-col items-center mb-5 md:mb-0">
+                    <div className="bg-primary-500 rounded-lg p-3">
                         <QRCode size={256} value={window.location.origin + '/upload'} />
                     </div>
-                    <div className="bg-primary-500 p-2 mt-2 rounded w-fit">
+                    <div className="bg-primary-500 p-2 mt-2 rounded">
                         <h1 className="font-bold text-white">Scan this QR</h1>
                     </div>
                 </div>
-                <div className="w-[50%] p-5">
+                <div className="w-full md:w-1/2 p-5">
                     <FileContainer files={files} onFileClick={handleFileClick} />
                     <button
-                        className="flex items-center px-4 py-2 rounded-full bg-danger-50 text-danger-700 hover:bg-danger-100 font-bold text-sm gap-2 m-2"
+                        className="flex items-center px-4 py-2 rounded-full bg-danger-50 text-danger-700 hover:bg-danger-100 font-bold text-sm gap-2 mt-2"
                         onClick={handleRemoveAll}
                     >
                         Clear Files <TrashIcon className="h-6" />
                     </button>
                 </div>
             </section>
-            <section className="h-[12%] bg-primary-500 flex items-center justify-center">
-                <div className="mt-5">
+            <section className="bg-primary-500 flex items-center justify-center py-4">
+                <div className="text-center">
                     <p className="text-sm text-gray-300">Powered by</p>
-                    <ul className="flex gap-2">
+                    <ul className="flex gap-2 justify-center mt-2">
                         <li><img src={LOGO} className="h-10 grayscale" alt="Logo" /></li>
                         <li><img src={DROPBOX_LOGO} className="h-10 grayscale" alt="Dropbox Logo" /></li>
                         <li><img src={FIREBASE_LOGO} className="h-10 grayscale" alt="Firebase Logo" /></li>
