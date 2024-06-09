@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getDatabase, ref, push, update } from "firebase/database"; // Ensure update is imported here
 import DocumentView from "../components/DocumentView";
 import { ChevronLeftIcon, PrinterIcon } from "@heroicons/react/24/solid";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -7,6 +8,7 @@ import LOGO from '../../assets/logo.png';
 import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
 import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
 import { ALL_PAGES, SPECIFIC_ONLY, COLORED, GRAYSCALE } from "../../utils/constants";
+import { getApp } from '../../config/firebase'; // Import your Firebase configuration
 
 const PrintProcessPage = () => {
     const [file, setFile] = useState("");
@@ -75,6 +77,35 @@ const PrintProcessPage = () => {
         let toPay = totalCopies * pricePerPage;
 
         setToPay(toPay);
+        savePrintDetails(toPay); // Save to Firebase
+    };
+
+    const savePrintDetails = (price) => {
+        const app = getApp();
+        const database = getDatabase(app);
+        const printRef = ref(database, 'printDetails/');
+
+        const newPrintKey = push(printRef).key;
+        const updates = {};
+        updates[`/printDetails/${newPrintKey}`] = {
+            fileName: name,
+            numPages,
+            fromPages,
+            toPages,
+            copies,
+            printStyle,
+            printMethod,
+            price,
+            date: new Date().toISOString()
+        };
+
+        update(ref(database), updates)
+            .then(() => {
+                console.log('Print details saved successfully');
+            })
+            .catch((error) => {
+                console.error('Error saving print details:', error);
+            });
     };
 
     const handlePrintDocument = (e) => {
@@ -150,7 +181,7 @@ const PrintProcessPage = () => {
                                 <h5 className="font-bold text-sm mb-1 text-gray-900 flex items-center gap-2">Insert Coins</h5>
                                 <input
                                     className="border px-3 py-2 rounded-md text-sm w-full" 
-                                    type="text" disabled value={`Php ${coins}`} />
+                                    type="text" value={coins} onChange={(e) => setCoins(parseFloat(e.target.value))} />
                             </div>
                         </div>
                         <div className="mt-5">

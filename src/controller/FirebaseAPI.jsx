@@ -54,8 +54,17 @@ export const readFilesOnce = (callback) => {
 export const deleteFiles = () => {
     const app = getApp();
     const database = getDatabase(app);
-    return set(ref(database, `${REF}`), null);
+
+    const filesRef = ref(database, `${REF}`);
+    const printDetailsRef = ref(database, 'printDetails');
+
+    const updates = {};
+    updates[`${REF}`] = null;
+    updates['printDetails'] = null;
+
+    return update(ref(database), updates);
 };
+
 
 export const readFileFromFirebase = async (filePath) => {
     const app = getApp();
