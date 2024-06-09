@@ -1,8 +1,8 @@
-import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { PrinterIcon, ChevronLeftIcon } from "@heroicons/react/24/solid";
-import DocumentView from "../components/DocumentView";
+import { toast } from 'react-toastify';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { PrinterIcon, ChevronLeftIcon } from '@heroicons/react/24/solid';
+import DocumentView from '../components/DocumentView';
 import {
     ALL_PAGES,
     SPECIFIC_ONLY,
@@ -13,9 +13,8 @@ import {
     FILE_NOT_FOUND_ERROR_MESSAGE,
     PRINT_ERROR_SPECIFIC_PAGES,
     PRINT_ERROR_NUM_COPIES
-} from "../../utils/constants";
+} from '../../utils/constants';
 import LOGO from '../../assets/logo.png';
-import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
 import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
 
 const DocumentViewer = () => {
@@ -33,9 +32,14 @@ const DocumentViewer = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const { file_url, file_name } = location.state;
+        const { bt_file, file_url, file_name } = location.state;
 
-        if (file_url) {
+        if (bt_file) {
+            setFile(bt_file);
+            setName(file_name);
+            setFileType(file_name.split('.').pop().toLowerCase());
+            toast.success(FILE_RETRIEVE_SUCCESS_MESSAGE);
+        } else if (file_url) {
             setFile(file_url);
             setName(file_name);
             setFileType(file_name.split('.').pop().toLowerCase());
@@ -84,7 +88,7 @@ const DocumentViewer = () => {
             return;
         }
 
-        navigate("/print", {
+        navigate('/print', {
             state: {
                 file,
                 name,
@@ -199,13 +203,12 @@ const DocumentViewer = () => {
                     <p className="text-sm text-gray-300">Powered by</p>
                     <ul className="flex gap-2 justify-center">
                         <li><img src={LOGO} className="h-10 grayscale" alt="Logo" /></li>
-                        <li><img src={DROPBOX_LOGO} className="h-10 grayscale" alt="Dropbox Logo" /></li>
                         <li><img src={FIREBASE_LOGO} className="h-10 grayscale" alt="Firebase Logo" /></li>
                     </ul>
                 </div>
             </section>
         </main>
     );
-}
+};
 
 export default DocumentViewer;

@@ -1,5 +1,7 @@
 export const LS_SETTINGS = "ls_settings"
 
+export const DUPLICATE_FILE = 'A file with this name already exists. Please choose a different file or rename it.';
+
 export const ALL_PAGES = "all-pages"
 export const SPECIFIC_ONLY = "specific-only"
 
@@ -26,3 +28,4 @@ export const UPLOAD_SUCCESS = "Successfully uploaded a file.";
 export const UPLOAD_ERROR = "Something went wrong while uploading the file.";
 
 export const DELETE_FILES_DUE_TO_INACTIVITY = "Due to inactivity, all the files sent in this server has been deleted."
+export const ONLY_PDF = "Only PDF files are accepted."

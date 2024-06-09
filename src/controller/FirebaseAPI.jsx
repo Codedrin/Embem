@@ -1,11 +1,12 @@
-import { getApp, storage } from "../config/firebase";
+import { getApp } from "../config/firebase";
 import { getDatabase, ref, set, update, push, onValue, get, child } from "firebase/database";
-import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const REF = "files";
 
 export const addFile = async (file) => {
     const app = getApp();
+    const storage = getStorage(app);
     const database = getDatabase(app);
 
     const { fileName, fileContent } = file;
@@ -16,6 +17,7 @@ export const addFile = async (file) => {
 
     // Get the download URL
     const url = await getDownloadURL(storageReference);
+    console.log('Download URL:', url);
 
     const newFile = {
         fileName,

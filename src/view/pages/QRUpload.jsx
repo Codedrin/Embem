@@ -5,7 +5,6 @@ import QRCode from 'react-qr-code';
 import { TrashIcon } from '@heroicons/react/24/solid';
 import FileContainer from '../components/FileContainer';
 import { readFiles, deleteFiles } from '../../controller/FirebaseAPI';
-import { deleteFiles as deleteFilesDROPBOX } from '../../controller/DropboxAPI';
 import { DELETE_FILES_ERROR, DELETE_FILES_SUCCESS } from '../../utils/constants';
 import LOGO from '../../assets/logo.png';
 import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
@@ -25,18 +24,11 @@ const QRUpload = () => {
 
     const handleRemoveAll = async () => {
         try {
-            const entries = files.map(f => ({ path: f.path }));
-            const fileDeletionProgress = await deleteFilesDROPBOX(entries);
-
-            if (fileDeletionProgress) {
-                await deleteFiles();
-                toast.success(DELETE_FILES_SUCCESS);
-            } else {
-                throw new Error(DELETE_FILES_ERROR);
-            }
+            await deleteFiles();
+            toast.success(DELETE_FILES_SUCCESS);
         } catch (error) {
             console.error(error);
-            toast.error(error.message);
+            toast.error(DELETE_FILES_ERROR);
         }
     };
 

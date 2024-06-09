@@ -74,13 +74,12 @@ const FileUploadMethodPage = () => {
                 <div className="mt-5">
                     <p className="text-sm text-gray-300">Powered by</p>
                     <ul className="flex gap-2 justify-center">
-                        <li><img src={LOGO} className="h-10 grayscale" /></li>
-                        <li><img src={DROPBOX_LOGO} className="h-10 grayscale" /></li>
-                        <li><img src={FIREBASE_LOGO} className="h-10 grayscale" /></li>
+                        <li><img src={LOGO} className="h-10 grayscale" alt="Logo" /></li>
+                        <li><img src={DROPBOX_LOGO} className="h-10 grayscale" alt="Dropbox Logo" /></li>
+                        <li><img src={FIREBASE_LOGO} className="h-10 grayscale" alt="Firebase Logo" /></li>
                     </ul>
                 </div>
             </section>
-
         </main>
     );
 }

@@ -7,8 +7,8 @@ import { getApp } from '../../config/firebase';
 import { useNavigate } from 'react-router-dom'; 
 import BG_PHOTO from '../../assets/images/undraw-uploading.svg';
 import LOGO from '../../assets/logo.png';
-import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
 import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
+import { ONLY_PDF } from '../../utils/constants';
 
 const UploadFiles = () => {
     const [selectedFile, setSelectedFile] = useState(null);
@@ -61,10 +61,10 @@ const UploadFiles = () => {
 
     const handleChangeChosenFile = (e) => {
         const file = e.target.files[0];
-        if (file && (file.type === 'application/pdf' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
+        if (file && file.type === 'application/pdf') {
             setSelectedFile(file);
         } else {
-            toast.error('Only PDF and Word files are accepted.');
+            toast.error(ONLY_PDF);
         }
     };
 
@@ -92,7 +92,7 @@ const UploadFiles = () => {
                             file:bg-primary-50 file:text-primary-700
                             hover:file:bg-primary-100
                             file:cursor-pointer"
-                        accept=".pdf,.docx"
+                        accept=".pdf"
                         onChange={handleChangeChosenFile}
                     />
                     <button
@@ -111,7 +111,6 @@ const UploadFiles = () => {
                     <p className="text-sm text-gray-300">Powered by</p>
                     <ul className="flex gap-2">
                         <li><img src={LOGO} className="h-10 grayscale" alt="Logo" /></li>
-                        <li><img src={DROPBOX_LOGO} className="h-10 grayscale" alt="Dropbox Logo" /></li>
                         <li><img src={FIREBASE_LOGO} className="h-10 grayscale" alt="Firebase Logo" /></li>
                     </ul>
                 </div>
