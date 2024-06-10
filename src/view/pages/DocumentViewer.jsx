@@ -25,7 +25,7 @@ const DocumentViewer = () => {
     const [maxPages, setMaxPages] = useState(-1);
     const [fromPages, setFromPages] = useState(1);
     const [toPages, setToPages] = useState(1);
-    const [copies, setCopies] = useState(1);
+    const [copies, setCopies] = useState(1);    
     const [name, setName] = useState('');
 
     const location = useLocation();
@@ -63,44 +63,46 @@ const DocumentViewer = () => {
     const handleChangePrintStyle = (e) => {
         setPrintStyle(e.target.value);
     };
+    const handleProceedButton = e => {
+        try{
+            e.preventDefault()
 
-    const handleProceedButton = (e) => {
-        e.preventDefault();
+            let modFromPages = -1
+            let modToPages = -1
 
-        let modFromPages = -1;
-        let modToPages = -1;
+            if(printMethod == SPECIFIC_ONLY) {
+                if(fromPages > maxPages || toPages > maxPages) {
+                    throw new Error(PRINT_ERROR_SPECIFIC_PAGES)
+                }
 
-        if (printMethod === SPECIFIC_ONLY) {
-            if (fromPages > maxPages || toPages > maxPages) {
-                toast.error(PRINT_ERROR_SPECIFIC_PAGES);
-                return;
+                modFromPages = fromPages
+                modToPages = toPages
+            }else{
+                modFromPages = 1
+                modToPages = maxPages
             }
 
-            modFromPages = fromPages;
-            modToPages = toPages;
-        } else {
-            modFromPages = 1;
-            modToPages = maxPages;
-        }
-
-        if (copies < 1 || copies > 100) {
-            toast.error(PRINT_ERROR_NUM_COPIES);
-            return;
-        }
-
-        navigate('/print', {
-            state: {
-                file,
-                name,
-                numPages: maxPages,
-                fromPages: modFromPages,
-                toPages: modToPages,
-                copies,
-                printStyle,
-                printMethod
+            if(copies < 1 || copies > 100) {
+                throw new Error(PRINT_ERROR_NUM_COPIES)
             }
-        });
-    };
+
+            navigate("/print", {
+                state:{
+                    file,
+                    name,
+                    numPages: maxPages,
+                    fromPages: modFromPages,
+                    toPages: modToPages,
+                    copies,
+                    printStyle,
+                    printMethod
+                }
+            })
+        }catch(error){
+            console.log(error)
+            toast.error(error)
+        }
+    }
 
     const handleBackBtn = () => {
         navigate(-1);

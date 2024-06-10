@@ -26,6 +26,7 @@ const QRUpload = () => {
         try {
             await deleteFiles();
             toast.success(DELETE_FILES_SUCCESS);
+            setFiles([]); // Clear local state
         } catch (error) {
             console.error(error);
             toast.error(DELETE_FILES_ERROR);

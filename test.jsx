@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getDatabase, ref, push, update } from "firebase/database"; // Ensure update is imported here
 import DocumentView from "../components/DocumentView";
 import { ChevronLeftIcon, PrinterIcon } from "@heroicons/react/24/solid";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -7,9 +8,7 @@ import LOGO from '../../assets/logo.png';
 import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
 import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
 import { ALL_PAGES, SPECIFIC_ONLY, COLORED, GRAYSCALE } from "../../utils/constants";
-import { getApp } from '../../config/firebase'; 
-import { getDatabase, ref, push, update } from "firebase/database";
-
+import { getApp } from '../../config/firebase'; // Import your Firebase configuration
 
 const PrintProcessPage = () => {
     const [file, setFile] = useState("");
@@ -29,7 +28,8 @@ const PrintProcessPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const { 
+        const {
+            bt_file,
             file,
             name,
             numPages,
@@ -38,18 +38,24 @@ const PrintProcessPage = () => {
             copies,
             printStyle,
             printMethod
-        } = location.state
+        } = location.state || {};
 
-        setFile(file)
-        setName(name)
-        setNumPages(numPages)
-        setFromPages(fromPages)
-        setToPages(toPages)
-        setCopies(copies)
-        setPrintStyle(printStyle)
-        setPrintMethod(printMethod)
-    }, [])
+        console.log('Received file:', bt_file || file); // Debugging line
 
+        setFile(bt_file || file || "");
+        setName(name || "");
+        setNumPages(numPages || 0);
+        setFromPages(fromPages || 1);
+        setToPages(toPages || 1);
+        setCopies(copies || 1);
+        setPrintStyle(printStyle || COLORED);
+        setPrintMethod(printMethod || ALL_PAGES);
+
+        // Determine file type based on file extension, ignoring query parameters
+        const fileType = (bt_file || file) ? (bt_file || file).type.split('/').pop().split('?')[0].toLowerCase() : "";
+        console.log("File Type: ", fileType); // Debugging line
+        setFileType(fileType);
+    }, [location.state]);
 
     useEffect(() => {
         if (file) {
@@ -60,6 +66,7 @@ const PrintProcessPage = () => {
     const handleBackBtn = () => {
         navigate(-1);
     };
+
     const calculatePrint = () => {
         let pricePerPage = -1;
         if (printStyle === COLORED) {
@@ -111,7 +118,7 @@ const PrintProcessPage = () => {
             toast.error("Please insert the right amount before printing.");
         } else {
             toast.success("Thank you for printing with us.");
-            navigate("/");
+            navigate("/upload-method");
         }
     };
 
@@ -177,7 +184,7 @@ const PrintProcessPage = () => {
                                 <h5 className="font-bold text-sm mb-1 text-gray-900 flex items-center gap-2">Insert Coins</h5>
                                 <input
                                     className="border px-3 py-2 rounded-md text-sm w-full" 
-                                    type="text" disabled value={`Php ${coins}`} />
+                                    type="text" value={coins} onChange={(e) => setCoins(parseFloat(e.target.value))} />
                             </div>
                         </div>
                         <div className="mt-5">

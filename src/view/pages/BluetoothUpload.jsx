@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { PrinterIcon, ChevronLeftIcon, FolderOpenIcon } from '@heroicons/react/24/solid';
 import DocumentView from '../components/DocumentView';
 import { LS_SETTINGS } from '../../utils/constants';
 import LOGO from '../../assets/logo.png';
+import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
 import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
+
 
 const BluetoothUpload = () => {
     const [settings, setSettings] = useState(null);
@@ -51,14 +54,15 @@ const BluetoothUpload = () => {
         }
     };
 
-    const handlePrintBtn = () => {
-        navigate('/view', {
+    const handlePrintBtn = (e) => {
+        navigate("/view", {
             state: {
-                bt_file: selectedFile,
-                file_name: selectedFileName
+                bt_file   : selectedFile,
+                file_name : selectedFileName
             }
-        });
-    };
+        })
+    }
+
 
     return (
         <main className="h-screen w-screen flex flex-col">
@@ -102,6 +106,7 @@ const BluetoothUpload = () => {
                     <p className="text-sm text-gray-300">Powered by</p>
                     <ul className="flex gap-2 justify-center">
                         <li><img src={LOGO} className="h-10 grayscale" alt="Logo" /></li>
+                        <li><img src={DROPBOX_LOGO} className="h-10 grayscale" alt="Dropbox Logo" /></li>
                         <li><img src={FIREBASE_LOGO} className="h-10 grayscale" alt="Firebase Logo" /></li>
                     </ul>
                 </div>

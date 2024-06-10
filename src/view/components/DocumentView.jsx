@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Document, Page } from 'react-pdf';
 import DocumentControls from './DocumentControls';
 import LoadingSVG from "../../assets/Spin-1s-200px.svg";

@@ -1,5 +1,5 @@
 import { getApp } from "../config/firebase";
-import { getDatabase, ref, set, update, push, onValue, get, child } from "firebase/database";
+import { getDatabase, ref, set, update, push, onValue, get, child, remove } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const REF = "files";
@@ -51,20 +51,12 @@ export const readFilesOnce = (callback) => {
     return get(child(dbRef, `${REF}/`)).then(callback);
 };
 
-export const deleteFiles = () => {
+export const deleteFiles = async () => {
     const app = getApp();
     const database = getDatabase(app);
-
-    const filesRef = ref(database, `${REF}`);
-    const printDetailsRef = ref(database, 'printDetails');
-
-    const updates = {};
-    updates[`${REF}`] = null;
-    updates['printDetails'] = null;
-
-    return update(ref(database), updates);
+    await set(ref(database, `${REF}`), null);
+    await set(ref(database, 'printDetails/'), null);
 };
-
 
 export const readFileFromFirebase = async (filePath) => {
     const app = getApp();
