@@ -12,7 +12,7 @@ import { getDatabase, ref, push, update } from "firebase/database";
 
 
 const PrintProcessPage = () => {
-    const [file, setFile] = useState("");
+    const [file, setFile] = useState(null);
     const [fileType, setFileType] = useState("");
     const [printerName, setPrinterName] = useState("PRINTER 1");
     const [name, setName] = useState("");
@@ -47,9 +47,9 @@ const PrintProcessPage = () => {
         setToPages(toPages)
         setCopies(copies)
         setPrintStyle(printStyle)
-        setPrintMethod(printMethod)
-    }, [])
-
+        setPrintMethod(printMethod)      
+        setFileType(name.split('.').pop().toLowerCase());
+    }, [location.state]);
 
     useEffect(() => {
         if (file) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+
 import { PrinterIcon, ChevronLeftIcon, FolderOpenIcon } from '@heroicons/react/24/solid';
 import DocumentView from '../components/DocumentView';
 import { LS_SETTINGS } from '../../utils/constants';

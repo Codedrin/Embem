@@ -12,6 +12,9 @@ const DocumentView = ({ file, fileType, onLoad }) => {
 
     const onLoadSuccess = (doc) => {
         const { numPages } = doc;
+        
+        console.log("PDF loaded successfully")
+
         setNumPages(numPages);
         onLoad(doc);
     };

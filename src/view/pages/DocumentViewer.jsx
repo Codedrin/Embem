@@ -70,7 +70,7 @@ const DocumentViewer = () => {
             let modFromPages = -1
             let modToPages = -1
 
-            if(printMethod == SPECIFIC_ONLY) {
+            if(printMethod === SPECIFIC_ONLY) {
                 if(fromPages > maxPages || toPages > maxPages) {
                     throw new Error(PRINT_ERROR_SPECIFIC_PAGES)
                 }
