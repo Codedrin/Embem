@@ -80,7 +80,7 @@
         };
 
         const handleBackBtn = (e) => {
-            navigate("/");
+            navigate("/admin-access");
         };
 
         return (

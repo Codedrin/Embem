@@ -6,37 +6,30 @@ import LOGO from '../../assets/logo.png';
 import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
 import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { LS_SETTINGS, LOGIN_SUCCESS, LOGIN_FAIL } from "../../utils/constants";
+import { LOGIN_SUCCESS, LOGIN_FAIL } from "../../utils/constants";
 
 const AdminAccess = () => {
     const navigate = useNavigate();
-    const [password, setPassword] = useState(null);
-    const [settings, setSettings] = useState(null);
-
-    useEffect(() => {
-        
-        const loadSettings = JSON.parse(localStorage.getItem(LS_SETTINGS));
-        setSettings(loadSettings);
-    }, []);
+    const [password, setPassword] = useState("");
 
     const handleBackBtn = () => {
         navigate(-1);
     };
 
     const handleSubmitBtn = (e) => {
-        e.preventDefault()
+        e.preventDefault();
 
-        const { password:savedPassword } = settings
+        const savedPassword = import.meta.env.VITE_ADMIN_PASSWORD;
 
-        if(password == savedPassword) {
-            toast.success(LOGIN_SUCCESS)
-            navigate("/settings")
-        }else{
-            toast.error(LOGIN_FAIL)
+        if (password === savedPassword) {
+            toast.success(LOGIN_SUCCESS);
+            navigate("/settings");
+        } else {
+            toast.error(LOGIN_FAIL);
         }
-    }
+    };
 
     return (
         <main className="h-screen w-full flex flex-col">
