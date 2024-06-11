@@ -12,32 +12,31 @@ import { LS_SETTINGS, LOGIN_SUCCESS, LOGIN_FAIL } from "../../utils/constants";
 
 const AdminAccess = () => {
     const navigate = useNavigate();
-    const [password, setPassword] = useState('');
+    const [password, setPassword] = useState(null);
     const [settings, setSettings] = useState(null);
 
     useEffect(() => {
-        // Retrieve settings from local storage
+        
         const loadSettings = JSON.parse(localStorage.getItem(LS_SETTINGS));
         setSettings(loadSettings);
     }, []);
 
     const handleBackBtn = () => {
-        navigate("/");
+        navigate(-1);
     };
 
     const handleSubmitBtn = (e) => {
-        e.preventDefault();
+        e.preventDefault()
 
-        // Retrieve saved password from settings
-        const savedPassword = settings?.password;
+        const { password:savedPassword } = settings
 
-        if (password === savedPassword) {
-            toast.success(LOGIN_SUCCESS);
-            navigate("/settings");
-        } else {
-            toast.error(LOGIN_FAIL);
+        if(password == savedPassword) {
+            toast.success(LOGIN_SUCCESS)
+            navigate("/settings")
+        }else{
+            toast.error(LOGIN_FAIL)
         }
-    };
+    }
 
     return (
         <main className="h-screen w-full flex flex-col">
