@@ -28,7 +28,6 @@ import { LS_SETTINGS, DELETE_FILES_DUE_TO_INACTIVITY } from "./utils/constants.j
 import { useIdleTimeout } from "./view/hooks/useIdle.jsx"
 import Maintenance from "./view/pages/MaintenancePage.jsx"
 
-
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
     'pdfjs-dist/build/pdf.worker.min.js',
     import.meta.url
@@ -96,7 +95,6 @@ const App = () => {
         <Route path="/print" element={<PrintProcessPage />} />
         <Route path="/settings" element={<SettingsPage /> } />
         <Route path="/admin-access" element={<AdminAccess />} />
-
       </Route>
     )
   )
