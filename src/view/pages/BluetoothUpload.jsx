@@ -7,7 +7,7 @@ import { LS_SETTINGS } from '../../utils/constants';
 import LOGO from '../../assets/logo.png';
 import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
 import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
-import { addFile } from '../../controller/FirebaseAPI';
+
 
 const BluetoothUpload = () => {
     const [settings, setSettings] = useState(null);
@@ -48,9 +48,7 @@ const BluetoothUpload = () => {
             setSelectedFile(blob);
             setFileType(file.type.split('/')[1]);
 
-            // Upload the file to Firebase
-            const downloadURL = await addFile({ fileName: file.name, fileContent: blob });
-            console.log('File uploaded to Firebase with URL:', downloadURL);
+            console.log('File selected:', file.name, fileType);
         } catch (error) {
             console.error('Error loading file: ', error);
         }
@@ -59,11 +57,12 @@ const BluetoothUpload = () => {
     const handlePrintBtn = (e) => {
         navigate("/view", {
             state: {
-                bt_file: selectedFile,
-                file_name: selectedFileName
+                bt_file   : selectedFile,
+                file_name : selectedFileName
             }
         })
     }
+
 
     return (
         <main className="h-screen w-screen flex flex-col">
