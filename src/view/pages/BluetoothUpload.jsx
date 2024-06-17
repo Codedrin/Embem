@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { PrinterIcon, ChevronLeftIcon, FolderOpenIcon } from '@heroicons/react/24/solid';
 import DocumentView from '../components/DocumentView';
 import { LS_SETTINGS } from '../../utils/constants';
 import LOGO from '../../assets/logo.png';
 import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
 import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
-
+import { addFile } from '../../controller/FirebaseAPI'; // Import the addFile function
 
 const BluetoothUpload = () => {
     const [settings, setSettings] = useState(null);
@@ -49,20 +48,44 @@ const BluetoothUpload = () => {
             setFileType(file.type.split('/')[1]);
 
             console.log('File selected:', file.name, fileType);
+
+            // Upload the file to Firebase
+            const downloadURL = await addFile({ fileName: file.name, fileContent: blob });
+            console.log('File uploaded to Firebase with URL:', downloadURL);
+
+            // Save file details to Firebase Realtime Database
+            await addFileToDatabase(file.name, downloadURL);
         } catch (error) {
             console.error('Error loading file: ', error);
         }
     };
 
+    const addFileToDatabase = async (fileName, downloadURL) => {
+        // This function should save the file details to Firebase Realtime Database
+        // Implement the function logic based on your requirements
+        const app = getApp();
+        const database = getDatabase(app);
+        const fileRef = ref(database, 'files/');
+
+        const newFileKey = push(fileRef).key;
+        const updates = {};
+        updates[`/files/${newFileKey}`] = {
+            fileName,
+            downloadURL,
+            uploadDate: new Date().toISOString(),
+        };
+
+        await update(ref(database), updates);
+    };
+
     const handlePrintBtn = (e) => {
         navigate("/view", {
             state: {
-                bt_file   : selectedFile,
-                file_name : selectedFileName
+                bt_file: selectedFile,
+                file_name: selectedFileName
             }
-        })
-    }
-
+        });
+    };
 
     return (
         <main className="h-screen w-screen flex flex-col">
