@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import DocumentView from "../components/DocumentView";
 import { ChevronLeftIcon, PrinterIcon } from "@heroicons/react/24/solid";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useReactToPrint } from 'react-to-print';
 import LOGO from '../../assets/logo.png';
 import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
 import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
@@ -10,11 +11,11 @@ import { ALL_PAGES, SPECIFIC_ONLY, COLORED, GRAYSCALE } from "../../utils/consta
 import { getApp } from '../../config/firebase'; 
 import { getDatabase, ref, push, update } from "firebase/database";
 
-
 const PrintProcessPage = () => {
     const [file, setFile] = useState(null);
     const [fileType, setFileType] = useState("");
-    const [printerName, setPrinterName] = useState("PRINTER 1");
+    const [printers, setPrinters] = useState([]);
+    const [printerName, setPrinterName] = useState("");
     const [name, setName] = useState("");
     const [numPages, setNumPages] = useState(0);
     const [fromPages, setFromPages] = useState(1);
@@ -23,13 +24,15 @@ const PrintProcessPage = () => {
     const [printStyle, setPrintStyle] = useState(COLORED);
     const [printMethod, setPrintMethod] = useState(ALL_PAGES);
     const [toPay, setToPay] = useState(0.00);
-    const [coins, setCoins] = useState(0.00);
+    const [coins, setCoins] = useState(10.00);
 
     const location = useLocation();
     const navigate = useNavigate();
 
+    const componentRef = useRef();
+
     useEffect(() => {
-        const { 
+        const {
             file,
             name,
             numPages,
@@ -47,7 +50,7 @@ const PrintProcessPage = () => {
         setToPages(toPages)
         setCopies(copies)
         setPrintStyle(printStyle)
-        setPrintMethod(printMethod)      
+        setPrintMethod(printMethod)
         setFileType(name.split('.').pop().toLowerCase());
     }, [location.state]);
 
@@ -57,9 +60,22 @@ const PrintProcessPage = () => {
         }
     }, [file]);
 
+    useEffect(() => {
+        const fetchPrinters = async () => {
+            const printerList = await window.electronAPI.getPrinters();
+            setPrinters(printerList);
+            if (printerList.length > 0) {
+                setPrinterName(printerList[0].name);
+            }
+        };
+
+        fetchPrinters();
+    }, []);
+
     const handleBackBtn = () => {
         navigate(-1);
     };
+
     const calculatePrint = () => {
         let pricePerPage = -1;
         if (printStyle === COLORED) {
@@ -111,9 +127,13 @@ const PrintProcessPage = () => {
             toast.error("Please insert the right amount before printing.");
         } else {
             toast.success("Thank you for printing with us.");
-            navigate("/");
+            handlePrint(); // Invoke the printing function
         }
     };
+
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
+    });
 
     return (
         <main className="w-full h-full">
@@ -124,7 +144,7 @@ const PrintProcessPage = () => {
                 </button>
             </section>
             <section className="h-[80%] flex flex-col lg:flex-row overflow-auto">
-                <div className="lg:w-1/2 p-2 overflow-auto">
+                <div className="lg:w-1/2 p-2 overflow-auto" ref={componentRef}>
                     <DocumentView 
                         file={file}
                         fileType={fileType}
@@ -134,9 +154,15 @@ const PrintProcessPage = () => {
                     <form className="w-full max-w-md">
                         <div className="my-5">
                             <h5 className="font-bold text-sm mb-1 text-gray-900 flex items-center gap-2">Printer Name<span><PrinterIcon className="h-4" /></span></h5>
-                            <input
-                                className="border px-3 py-2 rounded-md text-sm w-full" 
-                                type="text" disabled value={printerName} />
+                            <select 
+                                className="border px-3 py-2 rounded-md text-sm w-full"
+                                value={printerName}
+                                onChange={(e) => setPrinterName(e.target.value)}
+                            >
+                                {printers.map((printer, index) => (
+                                    <option key={index} value={printer.name}>{printer.name}</option>
+                                ))}
+                            </select>
                         </div>
                         <div className="flex flex-col lg:flex-row gap-3">
                             <div className="my-5 w-full">
