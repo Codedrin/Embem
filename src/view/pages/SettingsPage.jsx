@@ -1,188 +1,185 @@
-    import { useEffect, useState } from "react";
-    import { toast } from "react-toastify";
-    import LOGO from '../../assets/logo.png';
-    import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
-    import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
-    import { ChevronLeftIcon } from "@heroicons/react/24/solid";
-    import { useNavigate } from "react-router-dom";
-    import { getApp } from '../../config/firebase';
-    import { getDatabase, ref as databaseRef, onValue } from 'firebase/database';
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import LOGO from '../../assets/logo.png';
+import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
+import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
+import { ChevronLeftIcon } from "@heroicons/react/24/solid";
+import { useNavigate } from "react-router-dom";
+import { getApp } from '../../config/firebase';
+import { getDatabase, ref as databaseRef, onValue } from 'firebase/database';
 
-    import { LS_SETTINGS, SAVE_SUCCESS, SAVE_FAIL } from "../../utils/constants";
+import { LS_SETTINGS, SAVE_SUCCESS, SAVE_FAIL } from "../../utils/constants";
 
-    const SettingsPage = () => {
-        const navigate = useNavigate();
+const SettingsPage = () => {
+    const navigate = useNavigate();
 
-        const [settings, setSettings] = useState(null);
-        const [iBTName, setIBTName] = useState(null);
-        const [iBTFolder, setIBTFolder] = useState(null);
-        const [iTimeout, setITimeout] = useState(null);
-        const [iPassword, setIPassword] = useState(null);
+    const [settings, setSettings] = useState(null);
+    const [iBTName, setIBTName] = useState(null);
+    const [iBTFolder, setIBTFolder] = useState(null);
+    const [iTimeout, setITimeout] = useState(null);
+    const [iPassword, setIPassword] = useState(null);
 
-        const [report, setReport] = useState({});
+    const [dailyPrintedFiles, setDailyPrintedFiles] = useState(0);
+    const [dailyCoinsCollected, setDailyCoinsCollected] = useState(0);
 
-        useEffect(() => {
-            const currSettings = JSON.parse(localStorage.getItem(LS_SETTINGS));
-            setSettings(currSettings);
+    useEffect(() => {
+        const currSettings = JSON.parse(localStorage.getItem(LS_SETTINGS));
+        setSettings(currSettings);
 
-            setIBTName(currSettings?.btName);
-            setITimeout(currSettings?.timeout);
-            setIPassword(currSettings?.password);
+        setIBTName(currSettings?.btName);
+        setITimeout(currSettings?.timeout);
+        setIPassword(currSettings?.password);
 
-            const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-            fetchDailyReport(today, setReport);
-        }, []);
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        fetchPrintDetails(today);
+    }, []);
 
-        useEffect(() => {
-            if (settings) {
-                // Saves the settings to browser
-                localStorage.setItem(LS_SETTINGS, JSON.stringify(settings));
+    useEffect(() => {
+        if (settings) {
+            // Saves the settings to browser
+            localStorage.setItem(LS_SETTINGS, JSON.stringify(settings));
+        }
+    }, [settings]);
+
+    const fetchPrintDetails = (date) => {
+        const app = getApp();
+        const database = getDatabase(app);
+        const printDetailsRef = databaseRef(database, `printDetails`);
+
+        onValue(printDetailsRef, (snapshot) => {
+            const data = snapshot.val();
+            let printedFilesCount = 0;
+            let coinsCollectedTotal = 0;
+
+            for (let key in data) {
+                if (data[key].date.startsWith(date)) {
+                    printedFilesCount += data[key].copies;
+                    coinsCollectedTotal += data[key].price;
+                }
             }
-        }, [settings]);
 
-        const fetchDailyReport = (date, setReport) => {
-            const app = getApp();
-            const database = getDatabase(app);
-            const reportRef = databaseRef(database, `dailyReports/${date}`);
+            setDailyPrintedFiles(printedFilesCount);
+            setDailyCoinsCollected(coinsCollectedTotal);
+        });
+    };
 
-            onValue(reportRef, (snapshot) => {
-                const data = snapshot.val();
-                setReport(data);
-            });
-        };
+    const onChangeTimeout = (e) => {
+        const { value } = e.target;
+        console.log(value);
+        let convertToMilisec = value * 60 * 1000;
+        setITimeout(convertToMilisec);
+    };
 
-        const onChangeTimeout = (e) => {
-            const { value } = e.target;
-            console.log(value);
-            let convertToMilisec = value * 60 * 1000;
-            setITimeout(convertToMilisec);
-        };
+    const handleSave = (e) => {
+        e.preventDefault();
 
-        const handleSave = (e) => {
-            e.preventDefault();
+        try {
+            let newSettings = {
+                btName: iBTName,
+                btFSrvr: iBTFolder,
+                timeout: iTimeout,
+                password: iPassword
+            };
 
-            try {
-                let newSettings = {
-                    btName: iBTName,
-                    btFSrvr: iBTFolder,
-                    timeout: iTimeout,
-                    password: iPassword
-                };
+            // Updates and saves new Settings
+            setSettings(newSettings);
 
-                // Updates and saves new Settings
-                setSettings(newSettings);
+            toast.success(SAVE_SUCCESS);
+        } catch (error) {
+            console.log(error);
+            toast.error(SAVE_FAIL);
+        }
+    };
 
-                toast.success(SAVE_SUCCESS);
-            } catch (error) {
-                console.log(error);
-                toast.error(SAVE_FAIL);
-            }
-        };
+    const handleBackBtn = (e) => {
+        navigate("/admin-access");
+    };
 
-        const handleBackBtn = (e) => {
-            navigate("/admin-access");
-        };
-
-        return (
-            <main className="min-h-screen w-full flex flex-col">
-                <section className="bg-primary-500 h-16 flex items-center justify-center relative">
-                    <button className="absolute left-4 flex items-center p-4 gap-3" onClick={handleBackBtn}>
-                        <ChevronLeftIcon className="h-6 text-white" />
-                        <span><h1 className="font-bold text-white">Back</h1></span>
-                    </button>
-                </section>
-                <section className="flex flex-col md:flex-row flex-grow">
-                    <div className="w-full md:w-1/2 h-full flex flex-col justify-center items-center p-5">
+    return (
+        <main className="min-h-screen w-full flex flex-col">
+            <section className="bg-primary-500 h-16 flex items-center justify-center relative">
+                <button className="absolute left-4 flex items-center p-4 gap-3" onClick={handleBackBtn}>
+                    <ChevronLeftIcon className="h-6 text-white" />
+                    <span><h1 className="font-bold text-white">Back</h1></span>
+                </button>
+            </section>
+            <section className="flex flex-col md:flex-row flex-grow">
+                <div className="w-full md:w-1/2 h-full flex flex-col justify-center items-center p-5">
                     <br /> <br />  <br />
-                        <div className="text-center md:text-left">
-                            <h1 className="text-xl font-bold">Settings</h1>
-                            <p className="text-sm text-gray-500">Update the settings according to your preferences</p>
-                            <br />
-                                    
-                    <div className="bg-white p-4 rounded shadow mb-4">
-                        <h2 className="text-xl font-bold mb-2">Daily Printed Files</h2>
-                        <p>{report?.printedFiles?.count || 0}</p>
-                    </div>
-                    <div className="bg-white p-4 rounded shadow">
-                        <h2 className="text-xl font-bold mb-2 ">Daily Coins Collected</h2>
-                        <p>{report?.coinsCollected?.total || 0}</p>
-                    </div>
+                    <div className="text-center md:text-left">
+                        <h1 className="text-xl font-bold">Settings</h1>
+                        <p className="text-sm text-gray-500">Update the settings according to your preferences</p>
+                        <br />
+                        <div className="bg-white p-4 rounded shadow mb-4">
+                            <h2 className="text-xl font-bold mb-2">Daily Printed Files</h2>
+                            <p>{dailyPrintedFiles}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded shadow">
+                            <h2 className="text-xl font-bold mb-2">Daily Coins Collected</h2>
+                            <p>{dailyCoinsCollected}</p>
                         </div>
                     </div>
-                    <div className="w-full md:w-1/2 flex justify-center items-center p-5">
-                    
-                        <form action="" className="flex flex-col gap-4 w-full max-w-md">
-                            
-                            <div className="flex flex-col gap-2">
-                                <h1 className="text-lg font-bold text-primary-500">Bluetooth</h1>
-                                <div className="my-2">
-                                    <h5 className="font-semibold text-sm mb-1 text-gray-900">Bluetooth Name</h5>
-                                    <p className="text-xs mb-2 text-gray-500">Changed the bluetooth name<br /> according to the device's bluetooth.</p>
-                                    <input
-                                        className="border px-3 py-2 rounded-md text-sm outline-primary-200 w-full"
-                                        placeholder="Ex. BT-140"
-                                        value={iBTName}
-                                        onChange={e => setIBTName(e.target.value)} />
-                                </div>
-                                {/* <div className="my-2">
-                                    <h5 className="font-semibold text-sm mb-1 text-gray-900">Bluetooth Folder</h5>
-                                    <p className="text-xs mb-2 text-gray-500">Choose the path of where should the<br /> bluetooth files go</p>
-                                    <input
-                                        className="border px-3 py-2 rounded-md text-sm outline-primary-200 w-full"
-                                        type="url"
-                                        placeholder="C:/"
-                                        value={iBTFolder}
-                                        onChange={e => setIBTFolder(e.target.value)} />
-                                </div> */}
+                </div>
+                <div className="w-full md:w-1/2 flex justify-center items-center p-5">
+                    <form action="" className="flex flex-col gap-4 w-full max-w-md">
+                        <div className="flex flex-col gap-2">
+                            <h1 className="text-lg font-bold text-primary-500">Bluetooth</h1>
+                            <div className="my-2">
+                                <h5 className="font-semibold text-sm mb-1 text-gray-900">Bluetooth Name</h5>
+                                <p className="text-xs mb-2 text-gray-500">Changed the bluetooth name<br /> according to the device's bluetooth.</p>
+                                <input
+                                    className="border px-3 py-2 rounded-md text-sm outline-primary-200 w-full"
+                                    placeholder="Ex. BT-140"
+                                    value={iBTName}
+                                    onChange={e => setIBTName(e.target.value)} />
                             </div>
-                            <div>
-                                <h1 className="text-lg font-bold text-primary-500">Timeout</h1>
-                                <div className="my-2">
-                                    <h5 className="font-semibold text-sm mb-1 text-gray-900">Delete files after (minutes) of being idle</h5>
-                                    <p className="text-xs mb-2 text-gray-500">Files sent to the server<br /> will be deleted after the given time.</p>
-                                    <input
-                                        className="border px-3 py-2 rounded-md text-sm outline-primary-200 w-full"
-                                        placeholder="default 30 mins"
-                                        type="number"
-                                        value={iTimeout / 60 / 1000}
-                                        onChange={onChangeTimeout} />
-                                </div>
+                        </div>
+                        <div>
+                            <h1 className="text-lg font-bold text-primary-500">Timeout</h1>
+                            <div className="my-2">
+                                <h5 className="font-semibold text-sm mb-1 text-gray-900">Delete files after (minutes) of being idle</h5>
+                                <p className="text-xs mb-2 text-gray-500">Files sent to the server<br /> will be deleted after the given time.</p>
+                                <input
+                                    className="border px-3 py-2 rounded-md text-sm outline-primary-200 w-full"
+                                    placeholder="default 30 mins"
+                                    type="number"
+                                    value={iTimeout / 60 / 1000}
+                                    onChange={onChangeTimeout} />
                             </div>
-                            <div>
-                                <h1 className="text-lg font-bold text-primary-500">Administrator</h1>
-                                <div className="my-2">
-                                    <h5 className="font-semibold text-sm mb-1 text-gray-900">Password</h5>
-                                    <p className="text-xs mb-2 text-gray-500">Change the password to enter this settings option.</p>
-                                    <input
-                                        className="border px-3 py-2 rounded-md text-sm outline-primary-200 w-full"
-                                        type="password"
-                                        placeholder=""
-                                        value={iPassword}
-                                        onChange={e => setIPassword(e.target.value)} />
-                                </div>
+                        </div>
+                        <div>
+                            <h1 className="text-lg font-bold text-primary-500">Administrator</h1>
+                            <div className="my-2">
+                                <h5 className="font-semibold text-sm mb-1 text-gray-900">Password</h5>
+                                <p className="text-xs mb-2 text-gray-500">Change the password to enter this settings option.</p>
+                                <input
+                                    className="border px-3 py-2 rounded-md text-sm outline-primary-200 w-full"
+                                    type="password"
+                                    placeholder=""
+                                    value={iPassword}
+                                    onChange={e => setIPassword(e.target.value)} />
                             </div>
-                            <div className="">
-                                <button
-                                    className="mt-2 bg-secondary-50 px-4 py-1 hover:bg-secondary-100 border rounded text-sm font-semibold text-secondary-700 flex items-center gap-2"
-                                    onClick={handleSave}>Save</button>
-                                
-                            </div>
-                        </form>
-                    </div>
-                </section>
-                
-                <section className="bg-primary-500 flex items-center justify-center py-4">
-                    <div className="text-center">
-                        <p className="text-sm text-gray-300">Powered by</p>
-                        <ul className="flex gap-2 justify-center mt-2">
-                            <li><img src={LOGO} className="h-10 grayscale" /></li>
-                            <li><img src={DROPBOX_LOGO} className="h-10 grayscale" /></li>
-                            <li><img src={FIREBASE_LOGO} className="h-10 grayscale" /></li>
-                        </ul>
-                    </div>
-                </section>
-            </main>
-        )
-    }
+                        </div>
+                        <div className="">
+                            <button
+                                className="mt-2 bg-secondary-50 px-4 py-1 hover:bg-secondary-100 border rounded text-sm font-semibold text-secondary-700 flex items-center gap-2"
+                                onClick={handleSave}>Save</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            <section className="bg-primary-500 flex items-center justify-center py-4">
+                <div className="text-center">
+                    <p className="text-sm text-gray-300">Powered by</p>
+                    <ul className="flex gap-2 justify-center mt-2">
+                        <li><img src={LOGO} className="h-10 grayscale" /></li>
+                        <li><img src={DROPBOX_LOGO} className="h-10 grayscale" /></li>
+                        <li><img src={FIREBASE_LOGO} className="h-10 grayscale" /></li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+    );
+};
 
-    export default SettingsPage;
+export default SettingsPage;
