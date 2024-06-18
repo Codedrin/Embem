@@ -95,12 +95,22 @@ const SettingsPage = () => {
         navigate("/admin-access");
     };
 
+    const handleLogout = () => {
+        // Clear user session or authentication details
+        localStorage.removeItem('user'); // Adjust this to your session management logic
+        toast.success('Logged out successfully');
+        navigate("/"); // Adjust this to your login page route
+    };
+
     return (
         <main className="min-h-screen w-full flex flex-col">
             <section className="bg-primary-500 h-16 flex items-center justify-center relative">
                 <button className="absolute left-4 flex items-center p-4 gap-3" onClick={handleBackBtn}>
                     <ChevronLeftIcon className="h-6 text-white" />
                     <span><h1 className="font-bold text-white">Back</h1></span>
+                </button>
+                <button className="absolute right-4 flex items-center p-4 gap-3 bg-red-500 hover:bg-red-600 text-white rounded" onClick={handleLogout}>
+                    <span>Logout</span>
                 </button>
             </section>
             <section className="flex flex-col md:flex-row flex-grow">
