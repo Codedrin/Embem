@@ -10,6 +10,8 @@ import { getDatabase, ref as databaseRef, onValue } from 'firebase/database';
 
 import { LS_SETTINGS, SAVE_SUCCESS, SAVE_FAIL } from "../../utils/constants";
 
+const RESET_TIMESTAMP_KEY = "lastResetTimestamp";
+
 const SettingsPage = () => {
     const navigate = useNavigate();
 
@@ -32,6 +34,7 @@ const SettingsPage = () => {
 
         const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
         fetchPrintDetails(today);
+        checkAndResetCounters();
     }, []);
 
     useEffect(() => {
@@ -61,6 +64,20 @@ const SettingsPage = () => {
             setDailyPrintedFiles(printedFilesCount);
             setDailyCoinsCollected(coinsCollectedTotal);
         });
+    };
+
+    const checkAndResetCounters = () => {
+        const lastResetTimestamp = localStorage.getItem(RESET_TIMESTAMP_KEY);
+        const now = Date.now();
+
+        if (!lastResetTimestamp || now - lastResetTimestamp > 24 * 60 * 60 * 1000) {
+            // More than 24 hours have passed, reset counters
+            setDailyPrintedFiles(0);
+            setDailyCoinsCollected(0);
+
+            // Update the reset timestamp
+            localStorage.setItem(RESET_TIMESTAMP_KEY, now);
+        }
     };
 
     const onChangeTimeout = (e) => {
@@ -95,12 +112,22 @@ const SettingsPage = () => {
         navigate("/admin-access");
     };
 
+    const handleLogout = () => {
+        // Clear user session or authentication details
+        localStorage.removeItem('user'); // Adjust this to your session management logic
+        toast.success('Logged out successfully');
+        navigate("/"); // Adjust this to your login page route
+    };
+
     return (
         <main className="min-h-screen w-full flex flex-col">
             <section className="bg-primary-500 h-16 flex items-center justify-center relative">
                 <button className="absolute left-4 flex items-center p-4 gap-3" onClick={handleBackBtn}>
                     <ChevronLeftIcon className="h-6 text-white" />
                     <span><h1 className="font-bold text-white">Back</h1></span>
+                </button>
+                <button className="absolute right-2 flex items-center p-2 gap-3 bg-red-500 hover:bg-red-600 text-white rounded" onClick={handleLogout}>
+                    <span>Logout</span>
                 </button>
             </section>
             <section className="flex flex-col md:flex-row flex-grow">

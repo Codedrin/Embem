@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getDatabase, ref as dbRef, get, push, update } from "firebase/database";
+import { getDatabase, ref as dbRef, onValue, push, update, set } from "firebase/database";
 import axios from 'axios';
 import DocumentView from "../components/DocumentView";
 import { ChevronLeftIcon, PrinterIcon } from "@heroicons/react/24/solid";
@@ -24,7 +24,7 @@ const PrintProcessPage = () => {
   const [printStyle, setPrintStyle] = useState(COLORED);
   const [printMethod, setPrintMethod] = useState(ALL_PAGES);
   const [toPay, setToPay] = useState(0.00);
-  const [coins, setCoins] = useState(30.00);
+  const [coins, setCoins] = useState(0.00);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -70,6 +70,27 @@ const PrintProcessPage = () => {
     };
 
     fetchPrinters();
+
+    // Set up a listener to fetch the coin value from Firebase in real-time
+    const fetchCoins = () => {
+      try {
+        const app = getApp();
+        const database = getDatabase(app);
+        const coinRef = dbRef(database, 'coin/peso');
+        
+        onValue(coinRef, (snapshot) => {
+          if (snapshot.exists()) {
+            setCoins(parseFloat(snapshot.val()));
+          } else {
+            console.log("No coin value found in database.");
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching coin value:', error);
+      }
+    };
+
+    fetchCoins();
   }, []);
 
   const handleBackBtn = () => {
@@ -152,6 +173,12 @@ const PrintProcessPage = () => {
 
           if (response.data.status === 'success') {
             toast.success("Print job submitted successfully!");
+            
+            // Update coin value to the remaining amount
+            const remainingCoins = coins - toPay;
+            const coinRef = dbRef(database, 'coin/peso');
+            await set(coinRef, remainingCoins.toString());
+            
             navigate("/");
           } else {
             toast.error("Error submitting print job.");
@@ -240,7 +267,7 @@ const PrintProcessPage = () => {
                 <h5 className="font-bold text-sm mb-1 text-gray-900 flex items-center gap-2">Insert Coins</h5>
                 <input
                   className="border px-3 py-2 rounded-md text-sm w-full" 
-                  type="text" value={coins} onChange={(e) => setCoins(parseFloat(e.target.value) || 0)} />
+                  type="text" disabled value={coins} onChange={(e) => setCoins(parseFloat(e.target.value) || 0)} />
               </div>
             </div>
             <div className="mt-5">

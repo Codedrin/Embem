@@ -17,6 +17,7 @@
     "axios": "^1.7.2",
     "docx-preview": "^0.3.2",
     "dropbox": "^10.34.0",
+    "express": "^4.19.2",
     "firebase": "^10.12.2",
     "mammoth": "^1.7.2",
     "node": "^18.20.3",

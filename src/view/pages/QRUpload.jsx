@@ -9,7 +9,7 @@ import { DELETE_FILES_ERROR, DELETE_FILES_SUCCESS } from '../../utils/constants'
 import LOGO from '../../assets/logo.png';
 import DROPBOX_LOGO from '../../assets/images/dropbox-logo.png';
 import FIREBASE_LOGO from '../../assets/images/firebase-logo.png';
-
+import { PrinterIcon, ChevronLeftIcon, FolderOpenIcon } from '@heroicons/react/24/solid';
 const QRUpload = () => {
     const navigate = useNavigate();
     const [files, setFiles] = useState([]);
@@ -41,10 +41,16 @@ const QRUpload = () => {
             }
         });
     };
-
+    const handleBackBtn = () => {
+        navigate('/');
+    };
     return (
         <main className="min-h-screen flex flex-col">
             <section className="bg-primary-500 h-16 flex items-center justify-center relative">
+            <button className="absolute left-4 flex items-center p-4 gap-3" onClick={handleBackBtn}>
+                    <ChevronLeftIcon className="h-6 text-white" />
+                    <span><h1 className="font-bold text-white">Choose an upload method</h1></span>
+                </button>
                 <h1 className="text-white text-2xl font-bold cursor-pointer">
                     E M B E M
                 </h1>
