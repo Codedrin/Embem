@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getDatabase, ref as dbRef, onValue, push, update, set } from "firebase/database";
+import { getDatabase, ref as dbRef, onValue, push, update, set, get } from "firebase/database";
 import axios from 'axios';
 import DocumentView from "../components/DocumentView";
 import { ChevronLeftIcon, PrinterIcon } from "@heroicons/react/24/solid";
@@ -71,6 +71,7 @@ const PrintProcessPage = () => {
 
     fetchPrinters();
 
+ 
     // Set up a listener to fetch the coin value from Firebase in real-time
     const fetchCoins = () => {
       try {
@@ -164,6 +165,8 @@ const PrintProcessPage = () => {
           // Get the newest file
           const newestFile = filesArray[0];
           const fileUrl = newestFile.url;
+
+          console.log(`Submitting print job to printer: ${printerName} with file URL: ${fileUrl}`);
 
           // Send the file URL to the backend
           const response = await axios.post('http://localhost:3001/print', {
