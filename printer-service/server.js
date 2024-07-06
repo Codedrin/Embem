@@ -5,6 +5,7 @@ const path = require('path');
 const axios = require('axios');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const { exec } = require('child_process');
 
 const app = express();
 const port = 3001;
@@ -20,6 +21,18 @@ app.get('/printers', async (req, res) => {
     res.status(500).json({ status: 'error', error: error.message });
   }
 });
+
+const checkPrinterStatus = (printerName) => {
+  return new Promise((resolve, reject) => {
+    exec(`wmic printer where name="${printerName}" get PrinterStatus`, (error, stdout, stderr) => {
+      if (error) {
+        return reject(new Error('Failed to retrieve printer status'));
+      }
+      const status = stdout.trim().split('\n')[1].trim();
+      resolve(status === '3'); // 3 means online
+    });
+  });
+};
 
 app.post('/print', async (req, res) => {
   const { printerName, fileUrl } = req.body;
@@ -39,6 +52,21 @@ app.post('/print', async (req, res) => {
 
     writer.on('finish', async () => {
       try {
+        // Get the list of available printers
+        const printers = await getPrinters();
+        const printerNames = printers.map(printer => printer.name);
+
+        // Check if the provided printer name is in the list of available printers
+        if (!printerNames.includes(printerName)) {
+          throw new Error('Printer not found');
+        }
+
+        // Check if the printer is online
+        const isOnline = await checkPrinterStatus(printerName);
+        if (!isOnline) {
+          throw new Error('Printer is offline');
+        }
+
         // Print the downloaded file
         await print(filePath, { printer: printerName });
         // Remove the file after printing
